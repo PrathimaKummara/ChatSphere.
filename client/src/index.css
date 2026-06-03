@@ -1,0 +1,77 @@
+/* Inject Tailwind's base, components, and utility layers */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Universal resets for a consistent cross-browser baseline */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Global root variables and typography */
+:root {
+  /* Using Inter font stack for a premium professional look */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  /* NEW: High-End Color Tokens */
+  --brand-purple: #6c3bd4;
+  --true-black: #0d1117;
+  --whatsapp-beige: #efeae2;
+}
+
+/* Global body styles */
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  /* Default light mode background */
+  background-color: #f7f7ff;
+  color: #1a1240;
+}
+
+/* Dark Mode Overrides for "True Black" theme */
+.dark body {
+  /* GitHub-style true dark background */
+  background-color: #0d1117;
+  color: #f7f7ff;
+}
+
+/* Custom Scrollbar Styling (Purple Theme) */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  /* Using the new Royal Purple for the scroll handle */
+  background: #6c3bd4;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #5a2fb0;
+}
+
+/* WhatsApp-style Chat Background Pattern */
+.chat-bg-pattern {
+  /* Classic beige color for light mode */
+  background-color: #efeae2;
+  /* Subtle geometric pattern overlay */
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Dark mode chat background override */
+.dark .chat-bg-pattern {
+  /* True black background for dark mode */
+  background-color: #0d1117;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Custom transitions for smooth panel slide-ins */
+.transition-transform {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
