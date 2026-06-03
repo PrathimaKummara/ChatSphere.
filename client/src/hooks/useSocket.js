@@ -2,8 +2,8 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 // Import Socket.IO client library
 import { io } from 'socket.io-client';
-// Import axios for making HTTP requests
-import axios from 'axios';
+// Import api for making HTTP requests
+import api from '../utils/api';
 
 // Custom hook to manage real-time communication via Socket.IO
 export const useSocket = (username, userId) => {
@@ -35,8 +35,9 @@ export const useSocket = (username, userId) => {
 
   // Initialize the socket connection when the component mounts
   useEffect(() => {
-    // Connect using 127.0.0.1 to avoid IPv6 localhost resolution failures on Windows
-    const newSocket = io('http://127.0.0.1:5001', {
+    // Connect using configured socket URL or fallback to 127.0.0.1
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://127.0.0.1:5001';
+    const newSocket = io(socketUrl, {
       transports: ['websocket'] // Force WebSocket only
     });
 
@@ -165,9 +166,7 @@ export const useSocket = (username, userId) => {
     const fetchHistory = async () => {
       try {
         // Strip dm_ prefix for the API call if present
-        const response = await axios.get(`http://localhost:5000/api/messages/${roomId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const response = await api.get(`/api/messages/${roomId}`);
         setMessages(response.data);
         // Mark all messages as read since we just opened the conversation
         socket.emit('readMessages', { roomId, userId: userIdRef.current || localStorage.getItem('userId') });
