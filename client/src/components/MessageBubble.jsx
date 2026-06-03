@@ -69,7 +69,7 @@ const MessageBubble = ({ message, onAvatarClick, isGroup, isLastSeen }) => {
         else if (decryptionError) displayContent = '[Encrypted message]';
         else displayContent = 'Decrypting...';
       }
-      return <p className="text-[14.5px] leading-relaxed break-words">{displayContent}</p>;
+      return <p className="text-[14.5px] leading-relaxed break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{displayContent}</p>;
     }
 
     const fullUrl = `http://localhost:5000${message.fileUrl}`;
@@ -154,8 +154,6 @@ const MessageBubble = ({ message, onAvatarClick, isGroup, isLastSeen }) => {
 
   if (message.type === 'call') return renderCallBubble();
 
-  // Skip rendering Gemini/AI messages
-  if (String(message.senderId) === 'gemini' || message.type === 'ai') return null;
 
   return (
     <div className={`flex items-end px-[10px] md:px-[20px] animate-in slide-in-from-bottom-1 duration-300 ${isMe ? 'justify-end' : 'justify-start'}`}>

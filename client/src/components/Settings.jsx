@@ -254,7 +254,7 @@ const Settings = ({ isOpen, initialView = 'settings', onClose, onUpdateName, onU
                   type="text" 
                   value={displayName} 
                   onChange={(e) => setDisplayName(e.target.value)} 
-                  className="flex-1 bg-gray-50 dark:bg-brand-black/40 border border-gray-100 dark:border-white/5 rounded-xl px-4 py-2.5 text-brand-black dark:text-white font-bold focus:ring-2 focus:ring-brand-purple/35 outline-none transition-all text-sm" 
+                  className="flex-1 min-w-0 bg-gray-50 dark:bg-brand-black/40 border border-gray-100 dark:border-white/5 rounded-xl px-4 py-2.5 text-brand-black dark:text-white font-bold focus:ring-2 focus:ring-brand-purple/35 outline-none transition-all text-sm" 
                 />
                 <button 
                   onClick={handleSaveName} 

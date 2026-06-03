@@ -1,6 +1,6 @@
 # ChatSphere
 
-ChatSphere is a secure, real-time chat application featuring End-to-End Encryption (E2EE), real-time audio and video calling, and an integrated generative AI assistant. It is built as a multi-tier system with a React frontend and a Spring Boot backend.
+ChatSphere is a secure, real-time chat application featuring End-to-End Encryption (E2EE) and real-time audio and video calling. It is built as a multi-tier system with a React frontend and a Spring Boot backend.
 
 ## Tech Stack
 
@@ -18,7 +18,6 @@ ChatSphere is a secure, real-time chat application featuring End-to-End Encrypti
 - Spring Data MongoDB (Message database access)
 - Spring Data JPA & MySQL Driver (Relational user metadata database access)
 - Socket.IO Java / Netty-SocketIO (Real-time socket communication)
-- Google Gemini API (AI integration)
 
 ### Databases
 - MySQL: Stores relational entities (Users, Direct Conversations, Message Requests, Call History)
@@ -44,9 +43,6 @@ ChatSphere is a secure, real-time chat application featuring End-to-End Encrypti
 - Integrated premium ringtones and call status notifications (calling, connecting, incoming, active).
 - Persistent call history logged in MySQL database.
 
-### Intelligent AI Assistant
-- Integrated Google Gemini AI assistant.
-- Users can ask questions or receive assistance within the chat interface.
 
 ### Profile and Settings
 - User profile customization (username, about bio status, and profile avatar upload).
@@ -68,7 +64,6 @@ ChatSphere is a secure, real-time chat application featuring End-to-End Encrypti
 Configure your application settings in `java-server/src/main/resources/application.properties`:
 - Database connections (MySQL and MongoDB URIs, usernames, and passwords)
 - Server port settings (default backend: 5000, socket: 5001)
-- Google Gemini API key configuration
 - JWT token expiration parameters
 
 #### Frontend Configuration
