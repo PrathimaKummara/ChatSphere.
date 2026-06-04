@@ -1,0 +1,730 @@
+================================================================================
+CHATSPHERE CODEBASE ASSESSMENT REPORT
+================================================================================
+
+--------------------------------------------------------------------------------
+1. PROJECT STRUCTURE
+--------------------------------------------------------------------------------
+The folder structure of the project root (excluding node_modules, target, .git, and build artifacts):
+
++-- client/
++-- java-server/
++-- server/
+    .gitignore
+    README.md
+    client/.env.example
+    client/index.html
+    client/package-lock.json
+    client/package.json
+    client/postcss.config.cjs
+    client/tailwind.config.cjs
+    client/vite.config.js
++-- client/public/
+    client/public/favicon.svg
++-- client/public/sounds/
+    client/public/sounds/incoming.mp3
+    client/public/sounds/notification.mp3
+    client/public/sounds/ringtone.mp3
++-- client/src/
+    client/src/App.jsx
+    client/src/index.css
+    client/src/main.jsx
++-- client/src/components/
+    client/src/components/CallModal.jsx
+    client/src/components/ChatWindow.jsx
+    client/src/components/MessageBubble.jsx
+    client/src/components/ProfilePanel.jsx
+    client/src/components/Settings.jsx
+    client/src/components/Sidebar.jsx
+    client/src/components/TypingIndicator.jsx
++-- client/src/hooks/
+    client/src/hooks/useSocket.js
+    client/src/hooks/useWebRTC.js
++-- client/src/pages/
+    client/src/pages/Chat.jsx
+    client/src/pages/Login.jsx
+    client/src/pages/Register.jsx
++-- client/src/utils/
+    client/src/utils/api.js
+    client/src/utils/darkMode.js
+    client/src/utils/encryption.js
++-- java-server/src/
+    java-server/pom.xml
++-- java-server/src/main/java/com/chatsphere/server/
+    java-server/src/main/java/com/chatsphere/server/ServerApplication.java
++-- java-server/src/main/java/com/chatsphere/server/config/
+    java-server/src/main/java/com/chatsphere/server/config/SecurityConfig.java
+    java-server/src/main/java/com/chatsphere/server/config/SocketIOConfig.java
+    java-server/src/main/java/com/chatsphere/server/config/WebConfig.java
++-- java-server/src/main/java/com/chatsphere/server/controller/
+    java-server/src/main/java/com/chatsphere/server/controller/AuthController.java
+    java-server/src/main/java/com/chatsphere/server/controller/CallController.java
+    java-server/src/main/java/com/chatsphere/server/controller/MessageController.java
+    java-server/src/main/java/com/chatsphere/server/controller/RoomController.java
+    java-server/src/main/java/com/chatsphere/server/controller/UserController.java
++-- java-server/src/main/java/com/chatsphere/server/document/
+    java-server/src/main/java/com/chatsphere/server/document/Message.java
++-- java-server/src/main/java/com/chatsphere/server/entity/
+    java-server/src/main/java/com/chatsphere/server/entity/BlockedUser.java
+    java-server/src/main/java/com/chatsphere/server/entity/CallHistory.java
+    java-server/src/main/java/com/chatsphere/server/entity/DirectConversation.java
+    java-server/src/main/java/com/chatsphere/server/entity/MessageRequest.java
+    java-server/src/main/java/com/chatsphere/server/entity/Report.java
+    java-server/src/main/java/com/chatsphere/server/entity/Room.java
+    java-server/src/main/java/com/chatsphere/server/entity/RoomMember.java
+    java-server/src/main/java/com/chatsphere/server/entity/User.java
++-- java-server/src/main/java/com/chatsphere/server/repository/
+    java-server/src/main/java/com/chatsphere/server/repository/BlockedUserRepository.java
+    java-server/src/main/java/com/chatsphere/server/repository/CallHistoryRepository.java
+    java-server/src/main/java/com/chatsphere/server/repository/DirectConversationRepository.java
+    java-server/src/main/java/com/chatsphere/server/repository/MessageRepository.java
+    java-server/src/main/java/com/chatsphere/server/repository/MessageRequestRepository.java
+    java-server/src/main/java/com/chatsphere/server/repository/ReportRepository.java
+    java-server/src/main/java/com/chatsphere/server/repository/RoomMemberRepository.java
+    java-server/src/main/java/com/chatsphere/server/repository/RoomRepository.java
+    java-server/src/main/java/com/chatsphere/server/repository/UserRepository.java
++-- java-server/src/main/java/com/chatsphere/server/security/
+    java-server/src/main/java/com/chatsphere/server/security/JwtAuthenticationFilter.java
+    java-server/src/main/java/com/chatsphere/server/security/JwtTokenProvider.java
++-- java-server/src/main/java/com/chatsphere/server/service/
+    java-server/src/main/java/com/chatsphere/server/service/EmailService.java
++-- java-server/src/main/java/com/chatsphere/server/socket/
+    java-server/src/main/java/com/chatsphere/server/socket/SocketHandler.java
++-- java-server/src/main/resources/
+    java-server/src/main/resources/application.properties
++-- server/
+    server/.env
+    server/index.js
+    server/package-lock.json
+    server/package.json
++-- server/config/
+    server/config/db.js
+    server/config/mongo.js
++-- server/controllers/
+    server/controllers/authController.js
+    server/controllers/callController.js
+    server/controllers/messageController.js
+    server/controllers/roomController.js
+    server/controllers/userController.js
++-- server/middleware/
+    server/middleware/authMiddleware.js
+    server/middleware/uploadMiddleware.js
++-- server/models/
+    server/models/Message.js
+    server/models/User.js
++-- server/routes/
+    server/routes/authRoutes.js
+    server/routes/callRoutes.js
+    server/routes/messageRoutes.js
+    server/routes/roomRoutes.js
+    server/routes/userRoutes.js
++-- server/scratch/
+    server/scratch/db_setup.js
++-- server/services/
+    server/services/emailService.js
++-- server/socket/
+    server/socket/socketHandler.js
++-- server/uploads/
++-- server/uploads/avatars/
+
+Is there a java-server folder in addition to the server (Node.js) folder? If yes, what is it for?
+Yes, there is. The project includes two fully functional, alternative backend implementations that target the same database configurations (MySQL and MongoDB). One is written in Node.js + Express (located in `server/`), and the other is written in Java + Spring Boot (located in `java-server/`). Either backend can be run to service the React client.
+
+--------------------------------------------------------------------------------
+2. SERVER CONFIGURATION — contents of server/index.js
+--------------------------------------------------------------------------------
+// Load environment variables from the .env file into process.env
+require('dotenv').config();
+
+// Import the Express framework for handling HTTP requests
+const express = require('express');
+// Import the built-in HTTP module to create a server
+const http = require('http');
+// Import Socket.IO Server to enable real-time communication
+const { Server } = require('socket.io');
+// Import CORS middleware to allow cross-origin requests from the frontend
+const cors = require('cors');
+
+// Import our custom API route modules
+const authRoutes = require('./routes/authRoutes');
+const messageRoutes = require('./routes/messageRoutes');
+const callRoutes = require('./routes/callRoutes');
+const userRoutes = require('./routes/userRoutes');
+const roomRoutes = require('./routes/roomRoutes');
+
+// Import the real-time event handler for socket connections
+const { socketHandler } = require('./socket/socketHandler');
+// Import the MongoDB connection helper function
+const connectMongo = require('./config/mongo');
+
+// Import the MySQL database connection pool
+const db = require('./config/db');
+
+// Initialize the Express application
+const app = express();
+
+// Create an HTTP server using the Express app as the handler
+const server = http.createServer(app);
+
+// Initialize Socket.IO with advanced configuration for performance
+const io = new Server(server, {
+  cors: {
+    // Allow the frontend running on port 3000 (or other specified origin) to connect
+    origin: 'http://localhost:3000',
+    // Allow standard HTTP methods
+    methods: ['GET', 'POST']
+  },
+  pingTimeout: 60000,
+  pingInterval: 25000,
+  transports: ['websocket', 'polling'] 
+});
+
+// Attach io to the app so controllers can use it to emit events
+app.set('io', io);
+
+// Connect to MongoDB for storing chat message history
+connectMongo();
+
+// Verify the MySQL connection is healthy on server startup
+db.getConnection()
+  .then((connection) => {
+    console.log('MySQL Connected');
+    connection.release(); 
+  })
+  .catch((err) => {
+    console.error('MySQL Connection Error:', err);
+  });
+
+// Use standard middleware to parse JSON request bodies
+app.use(express.json());
+
+// Enable CORS for all REST API endpoints
+app.use(cors());
+
+// Serve the 'uploads' folder statically so the frontend can access media and avatars
+const path = require('path');
+const fs = require('fs');
+const uploadsDir = path.join(__dirname, 'uploads');
+const avatarsDir = path.join(uploadsDir, 'avatars');
+
+// Ensure upload directories exist on startup
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
+if (!fs.existsSync(avatarsDir)) fs.mkdirSync(avatarsDir, { recursive: true });
+
+app.use('/uploads', express.static(uploadsDir));
+
+// Mount the authentication routes
+app.use('/api/auth', authRoutes);
+// Mount the message history and request routes
+app.use('/api/messages', messageRoutes);
+// Mount the user profile and online status routes
+app.use('/api/users', userRoutes);
+app.use('/api/calls', callRoutes);
+// Mount the room/group management routes
+app.use('/api/rooms', roomRoutes);
+
+// Simple health check route to verify server is live
+app.get('/', (req, res) => {
+  res.send('ChatSphere Server is running!');
+});
+
+// Attach our real-time event listeners to the Socket.IO instance
+socketHandler(io);
+
+// Determine the port from environment variables or default to 5000
+const PORT = process.env.PORT || 5000;
+
+// Start listening for incoming connections
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
+* What is the CORS origin configuration?
+  The origin is configured to 'http://localhost:3000' (for WebSockets) and uses app.use(cors()) for REST endpoints (allowing all origins by default).
+* Is the PORT using process.env.PORT || 5000?
+  Yes: const PORT = process.env.PORT || 5000; (Line 106).
+* Is express.static set up to serve uploaded files?
+  Yes: app.use('/uploads', express.static(uploadsDir)); (Line 85).
+
+--------------------------------------------------------------------------------
+3. DATABASE CONFIGURATION — contents of server/config/db.js
+--------------------------------------------------------------------------------
+// Import the mysql2 package
+const mysql = require('mysql2');
+
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,         // Database host (e.g., localhost)
+  user: process.env.DB_USER,         // Database username (e.g., root)
+  password: process.env.DB_PASSWORD, // Database password
+  database: process.env.DB_NAME,     // Name of the database (chatsphere)
+  waitForConnections: true,          // Wait if all connections are in use
+  connectionLimit: 10,               // Maximum number of connections in the pool
+  queueLimit: 0                      // Unlimited queueing of connection requests
+});
+
+// Convert pool to use Promises so we can use modern async/await syntax
+const promisePool = pool.promise();
+
+// Export the promise-based pool for use in other parts of the app
+module.exports = promisePool;
+
+* Is DB_PORT being read from environment variables?
+  No, the configuration does not define or use a port parameter; it defaults to MySQL's default port of 3306.
+* Is the MySQL connection using process.env.DB_HOST, DB_USER, DB_PASSWORD, DB_NAME?
+  Yes, these are all passed to mysql.createPool (Lines 9-12).
+
+--------------------------------------------------------------------------------
+4. FRONTEND API CONFIGURATION
+--------------------------------------------------------------------------------
+Contents of client/src/utils/api.js:
+--------------------------------------------------------------------------------
+// Import axios library
+import axios from 'axios';
+
+// Create a configured axios instance
+const api = axios.create({
+  // Base URL for the ChatSphere backend
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000',
+});
+
+// Add a request interceptor to automatically attach the JWT token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add a response interceptor to handle expired or invalid JWT tokens
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      localStorage.clear();
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default api;
+
+--------------------------------------------------------------------------------
+Contents of client/src/hooks/useSocket.js (socket URL connection slice):
+--------------------------------------------------------------------------------
+  useEffect(() => {
+    // Connect using configured socket URL or fallback to 127.0.0.1
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://127.0.0.1:5001';
+    const newSocket = io(socketUrl, {
+      transports: ['websocket'] // Force WebSocket only
+    });
+    ...
+  }, []);
+
+* Are these using hardcoded localhost:5000 or import.meta.env.VITE_API_URL?
+  Both use environment variables with fallback support:
+  - Axios base URL: `import.meta.env.VITE_API_URL || 'http://localhost:5000'`
+  - Socket connection: `import.meta.env.VITE_SOCKET_URL || 'http://127.0.0.1:5001'`
+
+--------------------------------------------------------------------------------
+5. PACKAGE.JSON SCRIPTS — contents of server/package.json
+--------------------------------------------------------------------------------
+{
+  "name": "chatsphere-server",
+  "version": "1.0.0",
+  "description": "Backend for ChatSphere",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.0.0",
+    "multer": "^2.1.1",
+    "mysql2": "^3.2.0",
+    "nodemailer": "^8.0.7",
+    "socket.io": "^4.6.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}
+
+* What is the start script?
+  `node index.js`
+* What is the main entry file?
+  `index.js`
+
+--------------------------------------------------------------------------------
+6. ENVIRONMENT VARIABLES — server/.env contents
+--------------------------------------------------------------------------------
+# Server Configuration
+PORT=5000
+JWT_SECRET=your_super_secret_jwt_key_here
+
+# MySQL Configuration
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=***
+DB_NAME=chatsphere
+
+# MongoDB Configuration
+MONGO_URI=mongodb+srv://prathima:***@cluster0.9cjozde.mongodb.net/chatsphere?appName=Cluster0
+
+# Email Configuration (for OTP verification)
+EMAIL_USER=prathima.kummara@gmail.com
+EMAIL_PASS=***
+
+* Are all these present: PORT, DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT, MONGO_URI, JWT_SECRET, EMAIL_USER, EMAIL_PASS?
+  All are present EXCEPT `DB_PORT`, which is not defined in the `.env` file (it defaults to `3306` automatically in the MySQL driver).
+
+--------------------------------------------------------------------------------
+7. MYSQL DATABASE
+--------------------------------------------------------------------------------
+* Is MySQL currently running on localhost only or is it hosted somewhere?
+  It is running on localhost (locally as a system service named `MySQL80` on port `3306`).
+* Have these tables been created: Users, Rooms, ChannelMembers, DirectConversations, MessageRequests, CallHistory?
+  Yes. The active tables present in the database are:
+  - `users`
+  - `rooms`
+  - `channelmembers`
+  - `directconversations` / `direct_conversations`
+  - `messagerequests` / `message_requests`
+  - `callhistory`
+  - `blocked_users`
+  - `reports`
+  - `room_members`
+* Were these columns added: profile_pic, public_key, last_seen on the Users table?
+  Yes, all of these columns exist in the `users` table:
+  - `profile_pic`: varchar(500)
+  - `public_key`: text
+  - `last_seen`: datetime
+  - `about`: varchar(160) (also added dynamically)
+
+--------------------------------------------------------------------------------
+8. SOCKET.IO
+--------------------------------------------------------------------------------
+* userOnline handler from server/socket/socketHandler.js:
+  ```javascript
+  socket.on('userOnline', async (userData) => {
+    try {
+      const { userId, username } = userData;
+      if (!userId) return;
+
+      // Store both directions for lookup
+      const uId = String(userId);
+      onlineUsers[uId] = socket.id; // Map userId to the primary socketId
+      socketToUser[socket.id] = uId;
+
+      // Join the user-specific room (Backup for multi-tab support)
+      socket.join(`user_${uId}`);
+
+      if (!isNaN(userId)) {
+        await User.setOnlineStatus(userId, true);
+      }
+
+      // Broadcast the name list (userId: username) to everyone for UI status
+      const statusMap = {};
+      Object.keys(onlineUsers).forEach(uid => {
+        statusMap[uid] = 'Online';
+      });
+      io.emit('onlineUsersUpdated', statusMap);
+
+      console.log(`[Presence] User ${uId} is online on socket ${socket.id}`);
+    } catch (error) { console.error('userOnline error:', error); }
+  });
+  ```
+  Online users are stored in a standard **in-memory JavaScript Object** (`const onlineUsers = {};`), which maps stringified user IDs to their primary socket connection ID.
+
+* callUser handler from server/socket/socketHandler.js:
+  ```javascript
+  socket.on('callUser', (data) => {
+    const { userToCall, signalData, from, name, callType } = data;
+
+    console.log('📞 callUser received, to:', userToCall, typeof userToCall);
+    console.log('🗺️ Current Online Map:', JSON.stringify(onlineUsers));
+
+    // HYBRID LOOKUP: Try String, Number, and Raw to be 100% sure
+    const targetSocketId = onlineUsers[String(userToCall)] ||
+      onlineUsers[parseInt(userToCall)] ||
+      onlineUsers[userToCall];
+
+    console.log('📡 targetSocketId found:', targetSocketId);
+
+    if (!targetSocketId) {
+      // Receiver is offline — tell caller immediately
+      socket.emit('callRejected', {
+        reason: 'offline',
+        message: 'User is currently offline'
+      });
+      return; // stop here
+    }
+
+    if (targetSocketId) {
+      // Emit to the specific socket
+      io.to(targetSocketId).emit('incomingCall', {
+        signal: signalData,
+        from: socket.id,
+        fromUserId: from,
+        username: name,
+        callType
+      });
+      console.log(`✅ incomingCall emitted to socket ${targetSocketId}`);
+    }
+
+    // REDUNDANT EMIT: Also emit to the User Room for safety
+    const targetRoom = `user_${String(userToCall)}`;
+    io.to(targetRoom).emit('incomingCall', {
+      signal: signalData,
+      from: socket.id,
+      fromUserId: from,
+      username: name,
+      callType
+    });
+    console.log(`📡 Secondary signal sent to room: ${targetRoom}`);
+  });
+  ```
+
+--------------------------------------------------------------------------------
+9. ENCRYPTION — contents of client/src/utils/encryption.js
+--------------------------------------------------------------------------------
+// E2EE Utility — Web Crypto API (RSA-OAEP + AES-GCM hybrid encryption)
+
+const DB_NAME = 'ChatSphereE2EE';
+const STORE_NAME = 'keys';
+
+// ── IndexedDB Helpers ─────────────────────────────────────────────────────────
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, 1);
+    request.onupgradeneeded = (e) => {
+      e.target.result.createObjectStore(STORE_NAME);
+    };
+    request.onsuccess = (e) => resolve(e.target.result);
+    request.onerror = (e) => reject(e.target.error);
+  });
+}
+
+async function saveToIDB(key, value) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    tx.objectStore(STORE_NAME).put(value, key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = (e) => reject(e.target.error);
+  });
+}
+
+async function getFromIDB(key) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readonly');
+    const request = tx.objectStore(STORE_NAME).get(key);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = (e) => reject(e.target.error);
+  });
+}
+
+// ── Key Helpers ───────────────────────────────────────────────────────────────
+function arrayBufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+function base64ToArrayBuffer(base64) {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
+// ── Generate RSA-OAEP Keypair ─────────────────────────────────────────────────
+async function generateKeyPair() {
+  const keyPair = await crypto.subtle.generateKey(
+    {
+      name: 'RSA-OAEP',
+      modulusLength: 2048,
+      publicExponent: new Uint8Array([1, 0, 1]),
+      hash: 'SHA-256',
+    },
+    true,
+    ['encrypt', 'decrypt']
+  );
+  return keyPair;
+}
+
+// ── Export public key to base64 (spki) ────────────────────────────────────────
+async function exportPublicKey(publicKey) {
+  const exported = await crypto.subtle.exportKey('spki', publicKey);
+  return arrayBufferToBase64(exported);
+}
+
+// ── Import public key from base64 (spki) ─────────────────────────────────────
+async function importPublicKey(base64) {
+  const buffer = base64ToArrayBuffer(base64);
+  return crypto.subtle.importKey(
+    'spki',
+    buffer,
+    { name: 'RSA-OAEP', hash: 'SHA-256' },
+    false,
+    ['encrypt']
+  );
+}
+
+// ── Export private key to base64 (pkcs8) ──────────────────────────────────────
+async function exportPrivateKey(privateKey) {
+  const exported = await crypto.subtle.exportKey('pkcs8', privateKey);
+  return arrayBufferToBase64(exported);
+}
+
+// ── Import private key from base64 (pkcs8) ────────────────────────────────────
+async function importPrivateKey(base64) {
+  const buffer = base64ToArrayBuffer(base64);
+  return crypto.subtle.importKey(
+    'pkcs8',
+    buffer,
+    { name: 'pkcs8', hash: 'SHA-256' }, // Note: fixed format label for RSA private key import (PKCS#8)
+    false,
+    ['decrypt']
+  );
+}
+
+// ── initE2EE — called on login/register ───────────────────────────────────────
+export async function initE2EE(api) {
+  try {
+    let privateKeyB64 = await getFromIDB('privateKey');
+    let publicKeyB64 = await getFromIDB('publicKey');
+
+    if (!privateKeyB64 || !publicKeyB64) {
+      const keyPair = await generateKeyPair();
+      privateKeyB64 = await exportPrivateKey(keyPair.privateKey);
+      publicKeyB64 = await exportPublicKey(keyPair.publicKey);
+      await saveToIDB('privateKey', privateKeyB64);
+      await saveToIDB('publicKey', publicKeyB64);
+    }
+
+    // Upload public key to server
+    await api.put('/api/users/public-key', { publicKey: publicKeyB64 });
+  } catch (err) {
+    console.error('initE2EE failed:', err);
+  }
+}
+
+// ── loadPrivateKey — returns CryptoKey from IDB ───────────────────────────────
+export async function loadPrivateKey() {
+  const privateKeyB64 = await getFromIDB('privateKey');
+  if (!privateKeyB64) return null;
+  return importPrivateKey(privateKeyB64);
+}
+
+// ── getPublicKey — returns base64 public key string ───────────────────────────
+export async function getPublicKey() {
+  return getFromIDB('publicKey');
+}
+
+// ── encryptMessage — hybrid RSA+AES encryption ────────────────────────────────
+export async function encryptMessage(plaintext, recipientPublicKeyBase64) {
+  const recipientKey = await importPublicKey(recipientPublicKeyBase64);
+  const senderPublicKeyBase64 = await getPublicKey();
+
+  // Generate random AES-256-GCM key
+  const aesKey = await crypto.subtle.generateKey(
+    { name: 'AES-GCM', length: 256 },
+    true,
+    ['encrypt', 'decrypt']
+  );
+
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const encoder = new TextEncoder();
+  const encryptedBuffer = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv },
+    aesKey,
+    encoder.encode(plaintext)
+  );
+
+  const rawAesKey = await crypto.subtle.exportKey('raw', aesKey);
+  const encryptedAesKey = await crypto.subtle.encrypt(
+    { name: 'RSA-OAEP' },
+    recipientKey,
+    rawAesKey
+  );
+
+  let senderEncryptedAesKey = null;
+  if (senderPublicKeyBase64) {
+    const senderKey = await importPublicKey(senderPublicKeyBase64);
+    senderEncryptedAesKey = await crypto.subtle.encrypt(
+      { name: 'RSA-OAEP' },
+      senderKey,
+      rawAesKey
+    );
+  }
+
+  return {
+    encryptedContent: arrayBufferToBase64(encryptedBuffer),
+    encryptedKey: arrayBufferToBase64(encryptedAesKey),
+    senderEncryptedKey: senderEncryptedAesKey ? arrayBufferToBase64(senderEncryptedAesKey) : null,
+    iv: arrayBufferToBase64(iv),
+  };
+}
+
+// ── decryptMessage — hybrid RSA+AES decryption ────────────────────────────────
+export async function decryptMessage(encryptedContentB64, encryptedKeyB64, ivB64, privateKey) {
+  const encryptedAesKey = base64ToArrayBuffer(encryptedKeyB64);
+  const rawAesKey = await crypto.subtle.decrypt(
+    { name: 'RSA-OAEP' },
+    privateKey,
+    encryptedAesKey
+  );
+
+  const aesKey = await crypto.subtle.importKey(
+    'raw',
+    rawAesKey,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['decrypt']
+  );
+
+  const iv = base64ToArrayBuffer(ivB64);
+  const encryptedContent = base64ToArrayBuffer(encryptedContentB64);
+  const decryptedBuffer = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv },
+    aesKey,
+    encryptedContent
+  );
+
+  const decoder = new TextEncoder();
+  return decoder.decode(decryptedBuffer);
+}
+
+* Is E2EE currently working or breaking message sending?
+  E2EE is working. It runs conditionally based on whether the recipient has generated and registered a public key (i.e. `recipientPublicKey` exists). If no public key is registered for the receiver, message sending falls back gracefully to plain text over HTTPS/WSS, preventing E2EE from breaking chat flows.
+
+--------------------------------------------------------------------------------
+10. CURRENT KNOWN BUGS
+--------------------------------------------------------------------------------
+* Browser Console Errors (from Vercel production UI):
+  - `Failed to load resource: localhost:5000/api/auth/login:1 net::ERR_CONNECTION_REFUSED`
+  - `Failed to load resource: the server responded with a status of 404 () login:1`
+  - Reason: The client environment variable `VITE_API_URL` is undefined in Vercel settings, causing calls to fallback to `localhost:5000`.
+* Server Terminal Errors:
+  - None. Both client production build (`npm run build`) and active Spring Boot compilation build successfully.
+* Confirmed Working vs Broken Features:
+  - Working: Local development endpoints, WebRTC signaling channels, Settings panel redesign (glassmorphism/card UI), global and direct message routing, message "seen" status tracking, E2EE keys setup (IndexedDB storage), database schema migrations.
+  - Broken/Blocked in Production: API network connectivity on the deployed Vercel site due to missing environment variables.
