@@ -34,8 +34,12 @@ const server = http.createServer(app);
 // Initialize Socket.IO with advanced configuration for performance (Fix 5)
 const io = new Server(server, {
   cors: {
-    // Allow the frontend running on port 3000 (or other specified origin) to connect
-    origin: 'http://localhost:3000',
+    // Allow the frontend running on port 3000 or production Vercel URLs to connect
+    origin: [
+      'http://localhost:3000',
+      'https://chat-sphere-zeta.vercel.app',
+      'https://chat-sphere-lqg5uo60k-prathima-projects.vercel.app'
+    ],
     // Allow standard HTTP methods
     methods: ['GET', 'POST']
   },
@@ -69,8 +73,15 @@ db.getConnection()
 // Use standard middleware to parse JSON request bodies
 app.use(express.json());
 
-// Enable CORS for all REST API endpoints
-app.use(cors());
+// Enable CORS for frontend development and production environments
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://chat-sphere-zeta.vercel.app',
+    'https://chat-sphere-lqg5uo60k-prathima-projects.vercel.app'
+  ],
+  credentials: true
+}));
 
 // Serve the 'uploads' folder statically so the frontend can access media and avatars
 const path = require('path');
