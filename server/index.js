@@ -31,17 +31,19 @@ const app = express();
 // Create an HTTP server using the Express app as the handler
 const server = http.createServer(app);
 
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://chat-sphere-gray.vercel.app',
+  'https://chat-sphere-zeta.vercel.app',
+  'https://chat-sphere-lqg5uo60k-prathima-projects.vercel.app'
+];
+
 // Initialize Socket.IO with advanced configuration for performance (Fix 5)
 const io = new Server(server, {
   cors: {
-    // Allow the frontend running on port 3000 or production Vercel URLs to connect
-    origin: [
-      'http://localhost:3000',
-      'https://chat-sphere-zeta.vercel.app',
-      'https://chat-sphere-lqg5uo60k-prathima-projects.vercel.app'
-    ],
-    // Allow standard HTTP methods
-    methods: ['GET', 'POST']
+    origin: allowedOrigins,
+    methods: ['GET', 'POST'],
+    credentials: true
   },
   // PERFORMANCE TWEAK: Time to wait for a pong response before assuming connection is dead (Fix 5)
   pingTimeout: 60000,
@@ -75,11 +77,7 @@ app.use(express.json());
 
 // Enable CORS for frontend development and production environments
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://chat-sphere-zeta.vercel.app',
-    'https://chat-sphere-lqg5uo60k-prathima-projects.vercel.app'
-  ],
+  origin: allowedOrigins,
   credentials: true
 }));
 
