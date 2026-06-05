@@ -35,8 +35,8 @@ export const useSocket = (username, userId) => {
 
   // Initialize the socket connection when the component mounts
   useEffect(() => {
-    // Connect using configured socket URL or fallback to 127.0.0.1
-    const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://127.0.0.1:5001';
+    // Connect using configured socket URL or fallback to localhost:5000
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
     const newSocket = io(socketUrl, {
       transports: ['websocket'] // Force WebSocket only
     });
