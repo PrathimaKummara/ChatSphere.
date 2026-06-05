@@ -36,7 +36,7 @@ export const useSocket = (username, userId) => {
   // Initialize the socket connection when the component mounts
   useEffect(() => {
     // Connect using configured socket URL or fallback to localhost:5000
-    const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+    const socketUrl = 'https://chatsphere-ijss.onrender.com';
     const newSocket = io(socketUrl, {
       transports: ['websocket'] // Force WebSocket only
     });
