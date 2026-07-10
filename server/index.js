@@ -59,6 +59,19 @@ app.set('io', io);
 // Connect to MongoDB for storing chat message history
 connectMongo();
 
+// Keep MongoDB Atlas alive by pinging every 24 hours
+const mongoose = require('mongoose');
+setInterval(async () => {
+  try {
+    if (mongoose.connection && mongoose.connection.db) {
+      await mongoose.connection.db.admin().ping();
+      console.log('MongoDB keep-alive ping sent');
+    }
+  } catch (err) {
+    console.log('Ping failed:', err.message);
+  }
+}, 1000 * 60 * 60 * 24); // every 24 hours
+
 // Verify the MySQL connection is healthy on server startup
 db.getConnection()
   .then((connection) => {
