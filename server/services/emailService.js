@@ -2,13 +2,15 @@
 const nodemailer = require('nodemailer');
 
 // Set up the Gmail SMTP transporter
-// It uses the credentials from our .env file to log into your Gmail account
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
-  }
+  },
+  connectionTimeout: 8000, // 8 seconds connection timeout
+  greetingTimeout: 8000,   // 8 seconds SMTP greeting timeout
+  socketTimeout: 15000     // 15 seconds socket activity timeout
 });
 
 // Function to send the OTP email
