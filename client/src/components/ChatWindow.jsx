@@ -6,7 +6,7 @@ import {
   FileText, User, 
   MessageSquare, Info, BellOff, Trash2
 } from 'lucide-react';
-import api from '../utils/api';
+import api, { BASE_URL } from '../utils/api';
 import { encryptMessage } from '../utils/encryption';
 import MessageBubble from './MessageBubble';
 import ProfilePanel from './ProfilePanel';
@@ -235,7 +235,7 @@ const ChatWindow = ({
             <div className="relative flex-shrink-0">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm overflow-hidden ${activeRoom.profile_pic ? '' : 'bg-brand-purple'}`}>
                 {activeRoom.profile_pic
-                  ? <img src={`http://localhost:5000${activeRoom.profile_pic}`} className="w-full h-full object-cover rounded-full" alt="" />
+                  ? <img src={`${BASE_URL}${activeRoom.profile_pic}`} className="w-full h-full object-cover rounded-full" alt="" />
                   : activeRoom.name?.charAt(0).toUpperCase()}
               </div>
               {onlineUsers[activeRoom.otherUserId] && (

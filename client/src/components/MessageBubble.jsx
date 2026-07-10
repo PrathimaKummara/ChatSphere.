@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Download, FileText, ZoomIn, Phone, Video } from 'lucide-react';
 import { loadPrivateKey, decryptMessage } from '../utils/encryption';
+import { BASE_URL } from '../utils/api';
 
 const MessageBubble = ({ message, onAvatarClick, isGroup, isLastSeen }) => {
   const currentUserId = localStorage.getItem('userId');
@@ -72,7 +73,7 @@ const MessageBubble = ({ message, onAvatarClick, isGroup, isLastSeen }) => {
       return <p className="text-[14.5px] leading-relaxed break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{displayContent}</p>;
     }
 
-    const fullUrl = `http://localhost:5000${message.fileUrl}`;
+    const fullUrl = `${BASE_URL}${message.fileUrl}`;
     const isImage = message.fileType?.startsWith('image/');
     const isVideo = message.fileType?.startsWith('video/');
 
@@ -160,7 +161,7 @@ const MessageBubble = ({ message, onAvatarClick, isGroup, isLastSeen }) => {
       {(!isMe && isGroup) && (
         <div onClick={() => onAvatarClick && onAvatarClick(message.senderId)} className="w-8 h-8 rounded-full bg-[#6c3bd4] flex items-center justify-center text-white text-[10px] font-bold mb-1 mr-2 cursor-pointer shadow-sm flex-shrink-0 overflow-hidden">
           {message.senderProfilePic 
-            ? <img src={`http://localhost:5000${message.senderProfilePic}`} className="w-full h-full object-cover" alt="" />
+            ? <img src={`${BASE_URL}${message.senderProfilePic}`} className="w-full h-full object-cover" alt="" />
             : (message.senderName || 'U').charAt(0).toUpperCase()}
         </div>
       )}

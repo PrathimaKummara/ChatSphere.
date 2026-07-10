@@ -54,7 +54,7 @@ const Login = () => {
     setError('');
     setSuccessMessage('');
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+      const response = await api.post('/api/auth/login', { email, password });
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('username', response.data.username);
       localStorage.setItem('userId', response.data.id);
@@ -77,7 +77,7 @@ const Login = () => {
     setError('');
     setSuccessMessage('');
     try {
-      await axios.post('http://localhost:5000/api/auth/forgot-password', { email: resetEmail });
+      await api.post('/api/auth/forgot-password', { email: resetEmail });
       setSuccessMessage('An OTP has been sent to your email.');
       setView('forgot-otp');
     } catch (err) {
@@ -93,7 +93,7 @@ const Login = () => {
     setError('');
     setSuccessMessage('');
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/reset-password', {
+      const response = await api.post('/api/auth/reset-password', {
         email: resetEmail,
         otp: resetOtp,
         newPassword

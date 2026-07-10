@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import api from '../utils/api';
+import api, { BASE_URL } from '../utils/api';
 import { Camera, LogOut, Moon, Sun, Bell, User as UserIcon, Check, Loader2, ChevronLeft } from 'lucide-react';
 
 const Settings = ({ isOpen, initialView = 'settings', onClose, onUpdateName, onUpdateProfilePic, socket }) => {
@@ -157,7 +157,7 @@ const Settings = ({ isOpen, initialView = 'settings', onClose, onUpdateName, onU
               <div className="relative flex-shrink-0">
                 <div className="w-14 h-14 rounded-full flex items-center justify-center text-white font-extrabold text-lg overflow-hidden shadow-md ring-2 ring-brand-purple ring-offset-2 dark:ring-offset-brand-gray-dark transition-all duration-300 group-hover:ring-4">
                   {profilePic 
-                    ? <img src={`http://localhost:5000${profilePic}`} className="w-full h-full object-cover" alt="" /> 
+                    ? <img src={`${BASE_URL}${profilePic}`} className="w-full h-full object-cover" alt="" /> 
                     : displayName?.charAt(0).toUpperCase()}
                 </div>
               </div>
@@ -226,7 +226,7 @@ const Settings = ({ isOpen, initialView = 'settings', onClose, onUpdateName, onU
                   {avatarPreview 
                     ? <img src={avatarPreview} className="w-full h-full object-cover" alt="" /> 
                     : profilePic 
-                      ? <img src={`http://localhost:5000${profilePic}`} className="w-full h-full object-cover" alt="" /> 
+                      ? <img src={`${BASE_URL}${profilePic}`} className="w-full h-full object-cover" alt="" /> 
                       : <UserIcon className="w-12 h-12 text-gray-400" />}
                 </div>
                 <div className="absolute inset-0 rounded-full bg-black/45 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white">

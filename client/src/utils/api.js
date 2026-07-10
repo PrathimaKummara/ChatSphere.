@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+export const BASE_URL = 'https://chatsphere-ijss.onrender.com';
+
 const api = axios.create({
-  baseURL: 'https://chatsphere-ijss.onrender.com'
+  baseURL: BASE_URL
 });
 
 api.interceptors.request.use(

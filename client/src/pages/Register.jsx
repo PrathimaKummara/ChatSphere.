@@ -66,7 +66,7 @@ const Register = () => {
     
     try {
       // API call to trigger OTP email generation
-      await axios.post('http://localhost:5000/api/auth/send-otp', { email });
+      await api.post('/api/auth/send-otp', { email });
       // Proceed to the verification step
       setStep(2);
       // Initialize 30-second countdown for resending
@@ -145,7 +145,7 @@ const Register = () => {
     
     try {
       // API call to verify OTP and create the user record
-      const response = await axios.post('http://localhost:5000/api/auth/verify-otp', {
+      const response = await api.post('/api/auth/verify-otp', {
         username,
         email,
         password,

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import api from '../utils/api';
+import api, { BASE_URL } from '../utils/api';
 import { decryptMessage, loadPrivateKey } from '../utils/encryption';
 import { Moon, Sun, MessageSquarePlus, Settings2, Search, Phone, MessageSquare, Video, ArrowUpRight, ArrowDownLeft, X, Users, ChevronDown, Loader2, Check, Link } from 'lucide-react';
 
@@ -340,7 +340,7 @@ const Sidebar = ({ activeRoom, setActiveRoom, onlineUsers, username, profilePic,
         <button onClick={onOpenProfile} className="relative group transition-transform hover:scale-105 active:scale-95 border-none bg-transparent cursor-pointer p-0">
           <div className={`w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-brand-purple text-white font-bold text-lg shadow-sm border-2 border-white dark:border-brand-black`}>
             {profilePic 
-              ? <img src={`http://localhost:5000${profilePic}`} className="w-full h-full object-cover" alt="" />
+              ? <img src={`${BASE_URL}${profilePic}`} className="w-full h-full object-cover" alt="" />
               : username?.charAt(0).toUpperCase()}
           </div>
         </button>
@@ -435,7 +435,7 @@ const Sidebar = ({ activeRoom, setActiveRoom, onlineUsers, username, profilePic,
                 {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-brand-purple" />}
                 <div className="relative flex-shrink-0">
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-lg shadow-sm overflow-hidden ${conv.profile_pic ? '' : getAvatarColor(conv.name)}`}>
-                    {conv.profile_pic ? <img src={`http://localhost:5000${conv.profile_pic}`} className="w-full h-full object-cover" alt="" /> : conv.name?.charAt(0).toUpperCase()}
+                    {conv.profile_pic ? <img src={`${BASE_URL}${conv.profile_pic}`} className="w-full h-full object-cover" alt="" /> : conv.name?.charAt(0).toUpperCase()}
                   </div>
                   {onlineUsers[conv.otherUserId] && <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-brand-gray-dark rounded-full" />}
                 </div>
@@ -468,7 +468,7 @@ const Sidebar = ({ activeRoom, setActiveRoom, onlineUsers, username, profilePic,
             <button key={call.id} onClick={() => setSelectedCallUser(call.otherPerson)}
               className="w-full flex items-center h-[72px] px-3 border-none bg-transparent hover:bg-gray-50 dark:hover:bg-brand-gray-medium/20 cursor-pointer transition-all group">
               <div className={`w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center text-white text-lg overflow-hidden ${call.otherPerson.profile_pic ? '' : getAvatarColor(call.otherPerson.name)}`}>
-                {call.otherPerson.profile_pic ? <img src={`http://localhost:5000${call.otherPerson.profile_pic}`} className="w-full h-full object-cover" alt="" /> : call.otherPerson.name?.charAt(0).toUpperCase()}
+                {call.otherPerson.profile_pic ? <img src={`${BASE_URL}${call.otherPerson.profile_pic}`} className="w-full h-full object-cover" alt="" /> : call.otherPerson.name?.charAt(0).toUpperCase()}
               </div>
               <div className="ml-3 flex-1 text-left border-b border-gray-50 dark:border-brand-gray-light h-full flex flex-col justify-center overflow-hidden">
                 <div className="flex items-center justify-between">
@@ -540,7 +540,7 @@ const Sidebar = ({ activeRoom, setActiveRoom, onlineUsers, username, profilePic,
             <div className="pt-16 pb-6 px-6 flex flex-col items-center relative z-10">
               {/* Avatar with glow */}
               <div className={`relative w-24 h-24 rounded-full flex items-center justify-center text-white text-3xl font-bold mb-4 shadow-xl overflow-hidden ring-4 ring-white dark:ring-brand-gray-dark ${selectedCallUser.profile_pic ? '' : getAvatarColor(selectedCallUser.name)}`}>
-                {selectedCallUser.profile_pic ? <img src={`http://localhost:5000${selectedCallUser.profile_pic}`} className="w-full h-full object-cover rounded-full" alt="" /> : selectedCallUser.name?.charAt(0).toUpperCase()}
+                {selectedCallUser.profile_pic ? <img src={`${BASE_URL}${selectedCallUser.profile_pic}`} className="w-full h-full object-cover rounded-full" alt="" /> : selectedCallUser.name?.charAt(0).toUpperCase()}
               </div>
               
               <h3 className="text-2xl font-black text-brand-black dark:text-white tracking-tight">{selectedCallUser.name}</h3>
@@ -586,7 +586,7 @@ const Sidebar = ({ activeRoom, setActiveRoom, onlineUsers, username, profilePic,
             {dmResults.map(user => (
               <button key={user.id} onClick={() => handleSelectDMUser(user)} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/5 transition-all border-none bg-transparent cursor-pointer">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold overflow-hidden ${user.profile_pic ? '' : getAvatarColor(user.username)}`}>
-                  {user.profile_pic ? <img src={`http://localhost:5000${user.profile_pic}`} className="w-full h-full object-cover" alt="" /> : user.username?.charAt(0).toUpperCase()}
+                  {user.profile_pic ? <img src={`${BASE_URL}${user.profile_pic}`} className="w-full h-full object-cover" alt="" /> : user.username?.charAt(0).toUpperCase()}
                 </div>
                 <div className="text-left">
                   <p className="font-bold text-sm dark:text-white">{user.username}</p>

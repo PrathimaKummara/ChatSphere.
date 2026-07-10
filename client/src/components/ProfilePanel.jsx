@@ -4,7 +4,7 @@ import {
   Image as ImageIcon, FileText, Download, Flag, ShieldOff,
   ChevronRight, Loader2, AlertTriangle
 } from 'lucide-react';
-import api from '../utils/api';
+import api, { BASE_URL } from '../utils/api';
 
 const REPORT_REASONS = [
   'Spam or unwanted messages',
@@ -23,7 +23,7 @@ const FileItem = ({ file }) => {
   const handleDownload = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    const url = `http://localhost:5000${file.fileUrl}`;
+    const url = `${BASE_URL}${file.fileUrl}`;
     try {
       const response = await fetch(url);
       const blob = await response.blob();
@@ -47,7 +47,7 @@ const FileItem = ({ file }) => {
   return (
     <div 
       onClick={() => {
-        if (isDownloaded) window.open(`http://localhost:5000${file.fileUrl}`, '_blank');
+        if (isDownloaded) window.open(`${BASE_URL}${file.fileUrl}`, '_blank');
       }}
       className={`flex items-center gap-3 py-2 border-b border-gray-50 dark:border-white/5 last:border-0 ${isDownloaded ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
     >
@@ -204,7 +204,7 @@ const ProfilePanel = ({ user, onClose, onlineUsers = {}, startCall, onOpenSearch
           <div className="relative mb-5">
             <div className={`w-28 h-28 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-xl overflow-hidden ${profile?.profile_pic ? '' : avatarColor}`}>
               {profile?.profile_pic
-                ? <img src={`http://localhost:5000${profile.profile_pic}`} className="w-full h-full object-cover" alt={user.name} />
+                ? <img src={`${BASE_URL}${profile.profile_pic}`} className="w-full h-full object-cover" alt={user.name} />
                 : user.name?.charAt(0).toUpperCase()}
             </div>
             {isOnline && <div className="absolute bottom-1 right-1 w-5 h-5 bg-green-500 border-3 border-white dark:border-brand-black rounded-full" />}
@@ -303,9 +303,9 @@ const ProfilePanel = ({ user, onClose, onlineUsers = {}, startCall, onOpenSearch
               {imageFiles.length > 0 && (
                 <div className="grid grid-cols-3 gap-1 mb-3">
                   {imageFiles.slice(0, 6).map((file, i) => (
-                    <a key={i} href={`http://localhost:5000${file.fileUrl}`} target="_blank" rel="noreferrer"
+                    <a key={i} href={`${BASE_URL}${file.fileUrl}`} target="_blank" rel="noreferrer"
                       className="aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-white/5 block">
-                      <img src={`http://localhost:5000${file.fileUrl}`} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+                      <img src={`${BASE_URL}${file.fileUrl}`} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
                     </a>
                   ))}
                 </div>
@@ -396,8 +396,8 @@ const ProfilePanel = ({ user, onClose, onlineUsers = {}, startCall, onOpenSearch
                 <p className="text-xs text-gray-500 uppercase font-bold tracking-widest mb-3">Images</p>
                 <div className="grid grid-cols-3 gap-1 mb-6">
                   {imageFiles.map((file, i) => (
-                    <a key={i} href={`http://localhost:5000${file.fileUrl}`} target="_blank" rel="noreferrer" className="aspect-square rounded-lg overflow-hidden block">
-                      <img src={`http://localhost:5000${file.fileUrl}`} alt="" className="w-full h-full object-cover hover:opacity-80 transition-opacity" />
+                    <a key={i} href={`${BASE_URL}${file.fileUrl}`} target="_blank" rel="noreferrer" className="aspect-square rounded-lg overflow-hidden block">
+                      <img src={`${BASE_URL}${file.fileUrl}`} alt="" className="w-full h-full object-cover hover:opacity-80 transition-opacity" />
                     </a>
                   ))}
                 </div>
