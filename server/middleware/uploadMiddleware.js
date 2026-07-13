@@ -10,8 +10,10 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // Determine the target folder based on the fieldname
     const isAvatar = file.fieldname === 'avatar';
-    // Save to uploads/avatars/ or just uploads/
-    const dest = isAvatar ? 'uploads/avatars/' : 'uploads/';
+    // Use absolute paths based on __dirname to prevent CWD mismatch issues on cloud hosts
+    const dest = isAvatar 
+      ? path.join(__dirname, '../uploads/avatars') 
+      : path.join(__dirname, '../uploads');
     cb(null, dest);
   },
   filename: (req, file, cb) => {
