@@ -234,7 +234,7 @@ exports.getRequests = async (req, res) => {
   try {
     const userId = req.user.id;
     const [requests] = await db.query(
-      `SELECT * FROM MessageRequests WHERE to_user_id = ? AND status = 'pending'`,
+      `SELECT id, from_user_id AS fromUserId, from_username AS fromUsername, to_user_id AS toUserId, status, created_at AS createdAt FROM MessageRequests WHERE to_user_id = ? AND status = 'pending'`,
       [userId]
     );
     res.status(200).json(requests);
