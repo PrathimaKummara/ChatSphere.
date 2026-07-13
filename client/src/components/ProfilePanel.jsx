@@ -202,10 +202,25 @@ const ProfilePanel = ({ user, onClose, onlineUsers = {}, startCall, onOpenSearch
         {/* Profile Card */}
         <div className="p-8 flex flex-col items-center border-b border-gray-50 dark:border-white/5">
           <div className="relative mb-5">
-            <div className={`w-28 h-28 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-xl overflow-hidden ${profile?.profile_pic ? '' : avatarColor}`}>
-              {profile?.profile_pic
-                ? <img src={`${BASE_URL}${profile.profile_pic}`} className="w-full h-full object-cover" alt={user.name} />
-                : user.name?.charAt(0).toUpperCase()}
+            <div className={`w-28 h-28 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-xl overflow-hidden relative ${avatarColor}`}>
+              {profile?.profile_pic && (
+                <img 
+                  src={`${BASE_URL}${profile.profile_pic}`} 
+                  className="w-full h-full object-cover absolute top-0 left-0 animate-in fade-in duration-300" 
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    const fb = e.target.parentElement.querySelector('.profile-panel-fallback');
+                    if (fb) fb.style.display = 'flex';
+                  }}
+                  alt={user.name} 
+                />
+              )}
+              <div 
+                className="profile-panel-fallback w-full h-full flex items-center justify-center text-white font-bold"
+                style={{ display: profile?.profile_pic ? 'none' : 'flex' }}
+              >
+                {user.name?.charAt(0).toUpperCase()}
+              </div>
             </div>
             {isOnline && <div className="absolute bottom-1 right-1 w-5 h-5 bg-green-500 border-3 border-white dark:border-brand-black rounded-full" />}
           </div>

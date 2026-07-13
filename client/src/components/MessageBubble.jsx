@@ -159,10 +159,25 @@ const MessageBubble = ({ message, onAvatarClick, isGroup, isLastSeen }) => {
   return (
     <div className={`flex items-end px-[10px] md:px-[20px] animate-in slide-in-from-bottom-1 duration-300 ${isMe ? 'justify-end' : 'justify-start'}`}>
       {(!isMe && isGroup) && (
-        <div onClick={() => onAvatarClick && onAvatarClick(message.senderId)} className="w-8 h-8 rounded-full bg-[#6c3bd4] flex items-center justify-center text-white text-[10px] font-bold mb-1 mr-2 cursor-pointer shadow-sm flex-shrink-0 overflow-hidden">
-          {message.senderProfilePic 
-            ? <img src={`${BASE_URL}${message.senderProfilePic}`} className="w-full h-full object-cover" alt="" />
-            : (message.senderName || 'U').charAt(0).toUpperCase()}
+        <div onClick={() => onAvatarClick && onAvatarClick(message.senderId)} className="w-8 h-8 rounded-full bg-[#6c3bd4] flex items-center justify-center text-white text-[10px] font-bold mb-1 mr-2 cursor-pointer shadow-sm flex-shrink-0 overflow-hidden relative">
+          {message.senderProfilePic && (
+            <img 
+              src={`${BASE_URL}${message.senderProfilePic}`} 
+              className="w-full h-full object-cover absolute top-0 left-0 animate-in fade-in duration-300" 
+              onError={(e) => {
+                e.target.style.display = 'none';
+                const fb = e.target.parentElement.querySelector('.bubble-fallback');
+                if (fb) fb.style.display = 'flex';
+              }}
+              alt="" 
+            />
+          )}
+          <div 
+            className="bubble-fallback w-full h-full flex items-center justify-center text-white bg-[#6c3bd4]"
+            style={{ display: message.senderProfilePic ? 'none' : 'flex' }}
+          >
+            {(message.senderName || 'U').charAt(0).toUpperCase()}
+          </div>
         </div>
       )}
       

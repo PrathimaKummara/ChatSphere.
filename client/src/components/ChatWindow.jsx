@@ -249,10 +249,25 @@ const ChatWindow = ({
           {/* Avatar + name — clicking opens profile panel */}
           <button onClick={() => setShowProfile(true)} className="flex items-center gap-3 min-w-0 border-none bg-transparent cursor-pointer group">
             <div className="relative flex-shrink-0">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm overflow-hidden ${activeRoom.profile_pic ? '' : 'bg-brand-purple'}`}>
-                {activeRoom.profile_pic
-                  ? <img src={`${BASE_URL}${activeRoom.profile_pic}`} className="w-full h-full object-cover rounded-full" alt="" />
-                  : activeRoom.name?.charAt(0).toUpperCase()}
+              <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm overflow-hidden relative bg-brand-purple">
+                {activeRoom.profile_pic && (
+                  <img 
+                    src={`${BASE_URL}${activeRoom.profile_pic}`} 
+                    className="w-full h-full object-cover rounded-full absolute top-0 left-0 animate-in fade-in duration-300" 
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      const fb = e.target.parentElement.querySelector('.header-fallback');
+                      if (fb) fb.style.display = 'flex';
+                    }}
+                    alt="" 
+                  />
+                )}
+                <div 
+                  className="header-fallback w-full h-full flex items-center justify-center text-white font-bold"
+                  style={{ display: activeRoom.profile_pic ? 'none' : 'flex' }}
+                >
+                  {activeRoom.name?.charAt(0).toUpperCase()}
+                </div>
               </div>
               {onlineUsers[activeRoom.otherUserId] && (
                 <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-brand-black rounded-full" />

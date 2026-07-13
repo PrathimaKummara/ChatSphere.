@@ -155,10 +155,25 @@ const Settings = ({ isOpen, initialView = 'settings', onClose, onUpdateName, onU
               className="mx-2 p-4 bg-white dark:bg-brand-gray-dark border border-gray-100 dark:border-white/5 rounded-2xl shadow-sm cursor-pointer hover:shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 flex items-center gap-4 group"
             >
               <div className="relative flex-shrink-0">
-                <div className="w-14 h-14 rounded-full flex items-center justify-center text-white font-extrabold text-lg overflow-hidden shadow-md ring-2 ring-brand-purple ring-offset-2 dark:ring-offset-brand-gray-dark transition-all duration-300 group-hover:ring-4">
-                  {profilePic 
-                    ? <img src={`${BASE_URL}${profilePic}`} className="w-full h-full object-cover" alt="" /> 
-                    : displayName?.charAt(0).toUpperCase()}
+                <div className="w-14 h-14 rounded-full flex items-center justify-center text-white font-extrabold text-lg overflow-hidden shadow-md ring-2 ring-brand-purple ring-offset-2 dark:ring-offset-brand-gray-dark transition-all duration-300 group-hover:ring-4 relative bg-brand-purple">
+                  {profilePic && (
+                    <img 
+                      src={`${BASE_URL}${profilePic}`} 
+                      className="w-full h-full object-cover absolute top-0 left-0 animate-in fade-in duration-300" 
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        const fb = e.target.parentElement.querySelector('.profile-card-fallback');
+                        if (fb) fb.style.display = 'flex';
+                      }}
+                      alt="" 
+                    />
+                  )}
+                  <div 
+                    className="profile-card-fallback w-full h-full flex items-center justify-center text-white font-extrabold"
+                    style={{ display: profilePic ? 'none' : 'flex' }}
+                  >
+                    {displayName?.charAt(0).toUpperCase()}
+                  </div>
                 </div>
               </div>
               <div className="flex-1 min-w-0 pr-2">
@@ -222,12 +237,31 @@ const Settings = ({ isOpen, initialView = 'settings', onClose, onUpdateName, onU
                 className="relative group cursor-pointer" 
                 onClick={() => fileInputRef.current.click()}
               >
-                <div className="w-32 h-32 rounded-full bg-gray-100 dark:bg-brand-gray-medium flex items-center justify-center overflow-hidden ring-4 ring-brand-purple/20 shadow-lg">
-                  {avatarPreview 
-                    ? <img src={avatarPreview} className="w-full h-full object-cover" alt="" /> 
-                    : profilePic 
-                      ? <img src={`${BASE_URL}${profilePic}`} className="w-full h-full object-cover" alt="" /> 
-                      : <UserIcon className="w-12 h-12 text-gray-400" />}
+                <div className="w-32 h-32 rounded-full bg-gray-100 dark:bg-brand-gray-medium flex items-center justify-center overflow-hidden ring-4 ring-brand-purple/20 shadow-lg relative">
+                  {avatarPreview ? (
+                    <img src={avatarPreview} className="w-full h-full object-cover" alt="" />
+                  ) : (
+                    <>
+                      {profilePic && (
+                        <img 
+                          src={`${BASE_URL}${profilePic}`} 
+                          className="w-full h-full object-cover absolute top-0 left-0 animate-in fade-in duration-300" 
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            const fb = e.target.parentElement.querySelector('.edit-avatar-fallback');
+                            if (fb) fb.style.display = 'flex';
+                          }}
+                          alt="" 
+                        />
+                      )}
+                      <div 
+                        className="edit-avatar-fallback w-full h-full flex items-center justify-center"
+                        style={{ display: profilePic ? 'none' : 'flex' }}
+                      >
+                        <UserIcon className="w-12 h-12 text-gray-400" />
+                      </div>
+                    </>
+                  )}
                 </div>
                 <div className="absolute inset-0 rounded-full bg-black/45 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white">
                   <Camera className="w-6 h-6 mb-1" />
