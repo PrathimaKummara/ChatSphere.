@@ -1,38 +1,44 @@
 // server/services/emailService.js
 const nodemailer = require('nodemailer');
-const dns = require('dns');
+const dns = require('dns').promises;
 
-// Force DNS resolution to prioritize IPv4 (avoids IPv6 ENETUNREACH errors in IPv4-only cloud hosts like Render)
-if (dns.setDefaultResultOrder) {
-  dns.setDefaultResultOrder('ipv4first');
+// Function to resolve smtp.gmail.com to IPv4 dynamically on execution
+async function getSmtpHost() {
+  try {
+    const ips = await dns.resolve4('smtp.gmail.com');
+    if (ips && ips.length > 0) {
+      console.log(`DNS resolved smtp.gmail.com to IPv4: ${ips[0]}`);
+      return ips[0]; // Use the first resolved IPv4 address
+    }
+  } catch (err) {
+    console.error('DNS IPv4 resolution failed, falling back to hostname:', err.message);
+  }
+  return 'smtp.gmail.com'; // fallback to hostname if DNS fails
 }
-
-// Custom lookup function that forces Nodemailer to resolve IPv4 addresses
-const ipv4Lookup = (hostname, options, callback) => {
-  return dns.lookup(hostname, { ...options, family: 4 }, callback);
-};
-
-// Set up the Gmail SMTP transporter
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false, // Use STARTTLS (false) instead of SSL (true)
-  lookup: ipv4Lookup, // Force IPv4 resolution
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  },
-  tls: {
-    rejectUnauthorized: false // Avoid potential certificate trust issues on Render
-  },
-  connectionTimeout: 10000, // 10 seconds connection timeout
-  greetingTimeout: 10000,   // 10 seconds SMTP greeting timeout
-  socketTimeout: 20000     // 20 seconds socket activity timeout
-});
 
 // Function to send the OTP email
 const sendOTPEmail = async (toEmail, otp) => {
   try {
+    const smtpHost = await getSmtpHost();
+    
+    // Create transporter dynamically to use resolved IPv4 address
+    const transporter = nodemailer.createTransport({
+      host: smtpHost,
+      port: 587,
+      secure: false, // Use STARTTLS
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      },
+      tls: {
+        servername: 'smtp.gmail.com', // Ensure SSL handshake matches Gmail certificate CN
+        rejectUnauthorized: false     // Avoid potential certificate trust issues on Render
+      },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 20000
+    });
+
     // Define the email contents
     const mailOptions = {
       from: `"ChatSphere" <${process.env.EMAIL_USER}>`,
