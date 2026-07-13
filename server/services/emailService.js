@@ -1,13 +1,50 @@
-const { Resend } = require('resend');
+// server/services/emailService.js
+const nodemailer = require('nodemailer');
+const dns = require('dns').promises;
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Function to resolve smtp.gmail.com to IPv4 dynamically on execution to bypass Render IPv6 issues
+async function getSmtpHost() {
+  try {
+    const ips = await dns.resolve4('smtp.gmail.com');
+    if (ips && ips.length > 0) {
+      console.log(`DNS resolved smtp.gmail.com to IPv4: ${ips[0]}`);
+      return ips[0]; // Use the first resolved IPv4 address
+    }
+  } catch (err) {
+    console.error('DNS IPv4 resolution failed, falling back to hostname:', err.message);
+  }
+  return 'smtp.gmail.com'; // fallback to hostname if DNS fails
+}
 
+// Function to send the OTP email
 const sendOTPEmail = async (toEmail, otp) => {
   try {
-    await resend.emails.send({
-      from: 'ChatSphere <onboarding@resend.dev>',
+    const smtpHost = await getSmtpHost();
+    
+    // Create transporter dynamically to use resolved IPv4 address
+    const transporter = nodemailer.createTransport({
+      host: smtpHost,
+      port: 587,
+      secure: false, // Use STARTTLS
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      },
+      tls: {
+        servername: 'smtp.gmail.com', // Ensure SSL handshake matches Gmail certificate CN
+        rejectUnauthorized: false     // Avoid potential certificate trust issues on Render
+      },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 20000
+    });
+
+    // Define the email contents
+    const mailOptions = {
+      from: `"ChatSphere" <${process.env.EMAIL_USER}>`,
       to: toEmail,
       subject: 'Your ChatSphere Verification Code',
+      text: `Your OTP for ChatSphere registration is: ${otp}. It will expire in 5 minutes.`,
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; text-align: center; max-width: 500px; margin: auto; border: 1px solid #eaeaea; border-radius: 10px;">
           <h2 style="color: #333;">Welcome to ChatSphere!</h2>
@@ -18,12 +55,16 @@ const sendOTPEmail = async (toEmail, otp) => {
           <p style="color: #888; font-size: 12px;">This code will expire in 5 minutes.</p>
         </div>
       `
-    });
-    return true;
+    };
+
+    // Send the email using the transporter
+    await transporter.sendMail(mailOptions);
+    return true; // Successfully sent
   } catch (error) {
     console.error('Error sending OTP email:', error);
-    return false;
+    return false; // Failed to send
   }
 };
 
+// Export the function for use in the authController
 module.exports = { sendOTPEmail };
