@@ -344,51 +344,54 @@ const ChatWindow = ({
       </div>
 
       {/* ── MESSAGES ───────────────────────────────────────────────────────── */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-1 custom-scrollbar bg-[#efeae2] dark:bg-[#0d1117] relative">
-        {filteredMessages.length === 0 && searchQuery && (
-          <div className="flex flex-col items-center justify-center h-full text-gray-500 opacity-60">
+      <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-[#efeae2] dark:bg-[#0d1117] relative flex flex-col">
+        {filteredMessages.length === 0 && searchQuery ? (
+          <div className="flex flex-col items-center justify-center h-full text-gray-500 opacity-60 my-auto">
             <Search className="w-12 h-12 mb-2" />
             <p>No matches found for "{searchQuery}"</p>
           </div>
+        ) : (
+          <div className="mt-auto w-full space-y-1">
+            {filteredMessages.map((msg, index) => {
+              const isGroup = activeRoom?.id && !activeRoom.id.toString().startsWith('dm_');
+              
+              const currentUserId = localStorage.getItem('userId');
+              const isMe = String(msg.senderId) === String(currentUserId);
+              let isLastSeen = false;
+              if (isMe && msg.status === 'read' && !isGroup) {
+                const hasSubsequentMeRead = filteredMessages.slice(index + 1).some(
+                  m => String(m.senderId) === String(currentUserId) && m.status === 'read'
+                );
+                if (!hasSubsequentMeRead) {
+                  isLastSeen = true;
+                }
+              }
+
+              // Calculate if we should show date separator
+              const msgDateStr = new Date(msg.createdAt).toDateString();
+              const prevMsg = index > 0 ? filteredMessages[index - 1] : null;
+              const prevMsgDateStr = prevMsg ? new Date(prevMsg.createdAt).toDateString() : null;
+              const showDateSeparator = msgDateStr !== prevMsgDateStr;
+
+              return (
+                <React.Fragment key={msg._id || msg.id || index}>
+                  {showDateSeparator && (
+                    <div className="flex justify-center my-4 animate-in fade-in duration-300">
+                      <span className="bg-gray-100 dark:bg-brand-gray-light text-gray-500 dark:text-gray-300 text-[11px] font-semibold px-3 py-1 rounded-full shadow-sm select-none">
+                        {formatDateLabel(msg.createdAt)}
+                      </span>
+                    </div>
+                  )}
+                  <MessageBubble 
+                    message={msg} 
+                    isGroup={isGroup} 
+                    isLastSeen={isLastSeen} 
+                  />
+                </React.Fragment>
+              );
+            })}
+          </div>
         )}
-        {filteredMessages.map((msg, index) => {
-          const isGroup = activeRoom?.id && !activeRoom.id.toString().startsWith('dm_');
-          
-          const currentUserId = localStorage.getItem('userId');
-          const isMe = String(msg.senderId) === String(currentUserId);
-          let isLastSeen = false;
-          if (isMe && msg.status === 'read' && !isGroup) {
-            const hasSubsequentMeRead = filteredMessages.slice(index + 1).some(
-              m => String(m.senderId) === String(currentUserId) && m.status === 'read'
-            );
-            if (!hasSubsequentMeRead) {
-              isLastSeen = true;
-            }
-          }
-
-          // Calculate if we should show date separator
-          const msgDateStr = new Date(msg.createdAt).toDateString();
-          const prevMsg = index > 0 ? filteredMessages[index - 1] : null;
-          const prevMsgDateStr = prevMsg ? new Date(prevMsg.createdAt).toDateString() : null;
-          const showDateSeparator = msgDateStr !== prevMsgDateStr;
-
-          return (
-            <React.Fragment key={msg._id || msg.id || index}>
-              {showDateSeparator && (
-                <div className="flex justify-center my-4 animate-in fade-in duration-300">
-                  <span className="bg-gray-100 dark:bg-brand-gray-light text-gray-500 dark:text-gray-300 text-[11px] font-semibold px-3 py-1 rounded-full shadow-sm select-none">
-                    {formatDateLabel(msg.createdAt)}
-                  </span>
-                </div>
-              )}
-              <MessageBubble 
-                message={msg} 
-                isGroup={isGroup} 
-                isLastSeen={isLastSeen} 
-              />
-            </React.Fragment>
-          );
-        })}
         {typingUsers[activeRoom.id] && (
           <div className="text-xs text-gray-500 italic ml-14 mt-2">
             {typingUsers[activeRoom.id]} is typing...
