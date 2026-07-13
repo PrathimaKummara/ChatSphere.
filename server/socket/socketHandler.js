@@ -21,7 +21,12 @@ const socketHandler = (io) => {
 
         // Store both directions for lookup
         const uId = String(userId);
-        onlineUsers[uId] = socket.id; // Map userId to the primary socketId
+        if (!onlineUsers[uId]) {
+          onlineUsers[uId] = [];
+        }
+        if (!onlineUsers[uId].includes(socket.id)) {
+          onlineUsers[uId].push(socket.id);
+        }
         socketToUser[socket.id] = uId;
 
         // Join the user-specific room (Backup for multi-tab support)
@@ -50,9 +55,10 @@ const socketHandler = (io) => {
       console.log('🗺️ Current Online Map:', JSON.stringify(onlineUsers));
 
       // HYBRID LOOKUP: Try String, Number, and Raw to be 100% sure
-      const targetSocketId = onlineUsers[String(userToCall)] ||
+      const targetSocketIds = onlineUsers[String(userToCall)] ||
         onlineUsers[parseInt(userToCall)] ||
         onlineUsers[userToCall];
+      const targetSocketId = Array.isArray(targetSocketIds) ? targetSocketIds[0] : targetSocketIds;
 
       console.log('📡 targetSocketId found:', targetSocketId);
 
@@ -93,7 +99,8 @@ const socketHandler = (io) => {
       // If 'to' is already a socket ID (usually > 15 chars), return it directly
       if (typeof to === 'string' && to.length > 15) return [to];
       // Otherwise it's a userId, try to find the socket or the user room
-      const targetSocketId = onlineUsers[String(to)] || onlineUsers[parseInt(to)] || onlineUsers[to];
+      const targetSocketIds = onlineUsers[String(to)] || onlineUsers[parseInt(to)] || onlineUsers[to];
+      const targetSocketId = Array.isArray(targetSocketIds) ? targetSocketIds[0] : targetSocketIds;
       return targetSocketId ? [targetSocketId, `user_${to}`] : [`user_${to}`];
     };
 
@@ -237,9 +244,25 @@ const socketHandler = (io) => {
     socket.on('disconnect', () => {
       const userId = socketToUser[socket.id];
       if (userId) {
-        delete onlineUsers[userId];
         delete socketToUser[socket.id];
-        io.emit('onlineUsersUpdated', onlineUsers);
+        if (onlineUsers[userId]) {
+          // Remove this socket ID from the list
+          onlineUsers[userId] = onlineUsers[userId].filter(sid => sid !== socket.id);
+          // If no more sockets are connected for this user, they are truly offline
+          if (onlineUsers[userId].length === 0) {
+            delete onlineUsers[userId];
+            if (!isNaN(userId)) {
+              User.setOnlineStatus(userId, false).catch(() => {});
+            }
+          }
+        }
+        
+        // Broadcast the updated online users (uid: 'Online')
+        const statusMap = {};
+        Object.keys(onlineUsers).forEach(uid => {
+          statusMap[uid] = 'Online';
+        });
+        io.emit('onlineUsersUpdated', statusMap);
       }
     });
   });
