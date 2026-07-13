@@ -74,11 +74,19 @@ setInterval(async () => {
 
 // Verify the MySQL connection is healthy on server startup
 db.getConnection()
-  .then((connection) => {
+  .then(async (connection) => {
     // Log success if we can get a connection from the pool
     console.log('MySQL Connected');
     // Release it back so others can use it
     connection.release(); 
+
+    // Run database schema initialization (creates tables if they do not exist)
+    const initDatabase = require('./config/dbInit');
+    try {
+      await initDatabase();
+    } catch (dbInitErr) {
+      console.error('Failed to auto-initialize database tables:', dbInitErr);
+    }
   })
   .catch((err) => {
     // Log error if MySQL connection fails

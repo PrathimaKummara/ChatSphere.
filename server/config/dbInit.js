@@ -1,0 +1,102 @@
+const db = require('./db');
+
+async function initDatabase() {
+  console.log('Running database schema initialization...');
+  try {
+    // 1. Create Users Table
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS Users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(255) NOT NULL UNIQUE,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        profile_color VARCHAR(10) DEFAULT '#7F77DD',
+        is_online TINYINT(1) DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        last_seen DATETIME DEFAULT NULL,
+        profile_pic VARCHAR(500) DEFAULT NULL,
+        public_key TEXT DEFAULT NULL,
+        about VARCHAR(160) DEFAULT 'Hey there! I am using ChatSphere.'
+      ) ENGINE=InnoDB;
+    `);
+    console.log('Users table verified/created.');
+
+    // 2. Create callhistory Table
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS callhistory (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        caller_id INT NOT NULL,
+        receiver_id INT NOT NULL,
+        call_type ENUM('audio', 'video') NOT NULL,
+        status ENUM('missed', 'answered', 'rejected') NOT NULL,
+        started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        duration_seconds INT DEFAULT 0,
+        FOREIGN KEY (caller_id) REFERENCES Users(id) ON DELETE CASCADE,
+        FOREIGN KEY (receiver_id) REFERENCES Users(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB;
+    `);
+    console.log('callhistory table verified/created.');
+
+    // 3. Create BlockedUsers Table
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS BlockedUsers (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        blocker_id INT NOT NULL,
+        blocked_id INT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_block (blocker_id, blocked_id),
+        FOREIGN KEY (blocker_id) REFERENCES Users(id) ON DELETE CASCADE,
+        FOREIGN KEY (blocked_id) REFERENCES Users(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB;
+    `);
+    console.log('BlockedUsers table verified/created.');
+
+    // 4. Create Reports Table
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS Reports (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        reporter_id INT NOT NULL,
+        reported_id INT NOT NULL,
+        reason VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (reporter_id) REFERENCES Users(id) ON DELETE CASCADE,
+        FOREIGN KEY (reported_id) REFERENCES Users(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB;
+    `);
+    console.log('Reports table verified/created.');
+
+    // 5. Create Rooms Table
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS Rooms (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        description VARCHAR(500) DEFAULT NULL,
+        created_by INT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (created_by) REFERENCES Users(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB;
+    `);
+    console.log('Rooms table verified/created.');
+
+    // 6. Create RoomMembers Table
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS RoomMembers (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        room_id INT NOT NULL,
+        user_id INT NOT NULL,
+        joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_member (room_id, user_id),
+        FOREIGN KEY (room_id) REFERENCES Rooms(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB;
+    `);
+    console.log('RoomMembers table verified/created.');
+
+    console.log('Database initialization completed successfully.');
+  } catch (err) {
+    console.error('Database initialization failed:', err);
+    throw err;
+  }
+}
+
+module.exports = initDatabase;
