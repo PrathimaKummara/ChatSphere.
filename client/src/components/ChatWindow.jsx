@@ -242,12 +242,12 @@ const ChatWindow = ({
       {/* ── HEADER ─────────────────────────────────────────────────────────── */}
       <div className="h-[64px] px-4 flex items-center justify-between border-b border-[#e8e8f0] dark:border-brand-gray-light bg-white/80 dark:bg-brand-black/80 backdrop-blur-md z-20 shadow-sm relative flex-shrink-0">
         <div className="flex items-center flex-1 min-w-0">
-          <button onClick={() => setActiveRoom(null)} className="mr-2 md:hidden p-2 hover:bg-gray-100 dark:hover:bg-brand-gray-medium rounded-full transition-colors border-none bg-transparent cursor-pointer">
+          <button onClick={() => setActiveRoom(null)} className="mr-1 md:mr-2 md:hidden p-1.5 hover:bg-gray-100 dark:hover:bg-brand-gray-medium rounded-full transition-colors border-none bg-transparent cursor-pointer">
             <ChevronLeft className="w-6 h-6" />
           </button>
-
+ 
           {/* Avatar + name — clicking opens profile panel */}
-          <button onClick={() => setShowProfile(true)} className="flex items-center gap-3 min-w-0 border-none bg-transparent cursor-pointer group">
+          <button onClick={() => setShowProfile(true)} className="flex items-center gap-1.5 md:gap-3 min-w-0 border-none bg-transparent cursor-pointer group">
             <div className="relative flex-shrink-0">
               <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm overflow-hidden relative bg-brand-purple">
                 {activeRoom.profile_pic && (
@@ -273,34 +273,34 @@ const ChatWindow = ({
                 <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-brand-black rounded-full" />
               )}
             </div>
-            <div className="flex flex-col text-left">
-              <h3 className="font-bold text-[15px] md:text-lg text-brand-black dark:text-white flex items-center gap-1.5 leading-tight">
+            <div className="flex flex-col text-left min-w-0 flex-1">
+              <h3 className="font-bold text-[14px] md:text-lg text-brand-black dark:text-white truncate leading-tight">
                 {activeRoom.name}
               </h3>
-              <p className={`text-[11px] font-semibold ${onlineUsers[activeRoom.otherUserId] ? 'text-[#25d366]' : 'text-gray-400 dark:text-gray-500'}`}>
+              <p className={`text-[11px] font-semibold truncate ${onlineUsers[activeRoom.otherUserId] ? 'text-[#25d366]' : 'text-gray-400 dark:text-gray-500'}`}>
                 {onlineUsers[activeRoom.otherUserId] ? 'Online' : 'Offline'}
               </p>
             </div>
           </button>
         </div>
-
+ 
         {/* Action buttons */}
-        <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+        <div className="flex items-center gap-0.5 md:gap-2 flex-shrink-0">
           <button onClick={() => startCall(activeRoom.otherUserId, activeRoom.name, 'video')}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-brand-gray-medium text-gray-500 dark:text-gray-400 hover:text-brand-purple transition-all border-none bg-transparent cursor-pointer" title="Video Call">
+            className="p-1.5 md:p-2 rounded-full hover:bg-gray-100 dark:hover:bg-brand-gray-medium text-gray-500 dark:text-gray-400 hover:text-brand-purple transition-all border-none bg-transparent cursor-pointer" title="Video Call">
             <Video className="w-5 h-5" />
           </button>
           <button onClick={() => startCall(activeRoom.otherUserId, activeRoom.name, 'audio')}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-brand-gray-medium text-gray-500 dark:text-gray-400 hover:text-brand-purple transition-all border-none bg-transparent cursor-pointer" title="Voice Call">
+            className="p-1.5 md:p-2 rounded-full hover:bg-gray-100 dark:hover:bg-brand-gray-medium text-gray-500 dark:text-gray-400 hover:text-brand-purple transition-all border-none bg-transparent cursor-pointer" title="Voice Call">
             <Phone className="w-5 h-5" />
           </button>
           <button onClick={() => { setShowSearch(!showSearch); if (!showSearch) setSearchQuery(''); }}
-            className={`p-2 rounded-full transition-all border-none bg-transparent cursor-pointer ${showSearch ? 'bg-brand-purple text-white' : 'hover:bg-gray-100 dark:hover:bg-brand-gray-medium text-gray-500 dark:text-gray-400 hover:text-brand-purple'}`} title="Search">
+            className={`p-1.5 md:p-2 rounded-full transition-all border-none bg-transparent cursor-pointer hidden sm:inline-flex ${showSearch ? 'bg-brand-purple text-white' : 'hover:bg-gray-100 dark:hover:bg-brand-gray-medium text-gray-500 dark:text-gray-400 hover:text-brand-purple'}`} title="Search">
             <Search className="w-5 h-5" />
           </button>
           <div className="relative" ref={menuRef}>
             <button onClick={() => setShowMenu(!showMenu)}
-              className={`p-2 rounded-full transition-all border-none bg-transparent cursor-pointer ${showMenu ? 'bg-gray-100 dark:bg-brand-gray-medium' : 'hover:bg-gray-100 dark:hover:bg-brand-gray-medium text-gray-500 dark:text-gray-400 hover:text-brand-purple'}`} title="Options">
+              className={`p-1.5 md:p-2 rounded-full transition-all border-none bg-transparent cursor-pointer ${showMenu ? 'bg-gray-100 dark:bg-brand-gray-medium' : 'hover:bg-gray-100 dark:hover:bg-brand-gray-medium text-gray-500 dark:text-gray-400 hover:text-brand-purple'}`} title="Options">
               <MoreVertical className="w-5 h-5" />
             </button>
             {showMenu && (
@@ -308,6 +308,10 @@ const ChatWindow = ({
                 <button onClick={() => { setShowProfile(true); setShowMenu(false); }}
                   className="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-brand-black dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5 transition-all text-left border-none bg-transparent cursor-pointer">
                   <Info className="w-4 h-4" /> View Contact
+                </button>
+                <button onClick={() => { setShowSearch(true); setShowMenu(false); }}
+                  className="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-brand-black dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5 transition-all text-left border-none bg-transparent cursor-pointer sm:hidden">
+                  <Search className="w-4 h-4" /> Search Messages
                 </button>
                 <button className="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-brand-black dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5 transition-all text-left border-none bg-transparent cursor-pointer">
                   <BellOff className="w-4 h-4" /> Mute Notifications
