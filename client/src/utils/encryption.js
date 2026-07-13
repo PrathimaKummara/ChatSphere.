@@ -109,15 +109,18 @@ async function importPrivateKey(base64) {
 // Generates keypair if not already stored, then uploads public key to server.
 export async function initE2EE(api) {
   try {
-    let privateKeyB64 = await getFromIDB('privateKey');
-    let publicKeyB64 = await getFromIDB('publicKey');
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+
+    let privateKeyB64 = await getFromIDB(`privateKey_${userId}`);
+    let publicKeyB64 = await getFromIDB(`publicKey_${userId}`);
 
     if (!privateKeyB64 || !publicKeyB64) {
       const keyPair = await generateKeyPair();
       privateKeyB64 = await exportPrivateKey(keyPair.privateKey);
       publicKeyB64 = await exportPublicKey(keyPair.publicKey);
-      await saveToIDB('privateKey', privateKeyB64);
-      await saveToIDB('publicKey', publicKeyB64);
+      await saveToIDB(`privateKey_${userId}`, privateKeyB64);
+      await saveToIDB(`publicKey_${userId}`, publicKeyB64);
     }
 
     // Upload public key to server
@@ -129,14 +132,18 @@ export async function initE2EE(api) {
 
 // ── loadPrivateKey — returns CryptoKey from IDB ───────────────────────────────
 export async function loadPrivateKey() {
-  const privateKeyB64 = await getFromIDB('privateKey');
+  const userId = localStorage.getItem('userId');
+  if (!userId) return null;
+  const privateKeyB64 = await getFromIDB(`privateKey_${userId}`);
   if (!privateKeyB64) return null;
   return importPrivateKey(privateKeyB64);
 }
 
 // ── getPublicKey — returns base64 public key string ───────────────────────────
 export async function getPublicKey() {
-  return getFromIDB('publicKey');
+  const userId = localStorage.getItem('userId');
+  if (!userId) return null;
+  return getFromIDB(`publicKey_${userId}`);
 }
 
 // ── encryptMessage — hybrid RSA+AES encryption ────────────────────────────────
