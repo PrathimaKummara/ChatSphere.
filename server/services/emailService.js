@@ -1,5 +1,11 @@
 // server/services/emailService.js
 const nodemailer = require('nodemailer');
+const dns = require('dns');
+
+// Force DNS resolution to prioritize IPv4 (avoids IPv6 ENETUNREACH errors in IPv4-only cloud hosts like Render)
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
 
 // Set up the Gmail SMTP transporter
 const transporter = nodemailer.createTransport({
