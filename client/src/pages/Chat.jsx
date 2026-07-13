@@ -102,7 +102,7 @@ const Chat = () => {
       try {
         const res = await api.get(`/api/messages/${activeRoom.id}`);
         setMessages(res.data);
-        if (socket) {
+        if (socket && document.hasFocus() && document.visibilityState === 'visible') {
           socket.emit('readMessages', { roomId: activeRoom.id, userId });
         }
       } catch (err) { console.error('Failed to load history', err); }
@@ -112,16 +112,41 @@ const Chat = () => {
     if (socket) socket.emit('joinRoom', activeRoom.id);
   }, [activeRoom, socket, userId]);
 
+  // Mark messages as read when window gains focus and a room is active
+  useEffect(() => {
+    if (!socket || !activeRoom || !userId) return;
+
+    const handleFocus = () => {
+      if (document.hasFocus() && document.visibilityState === 'visible') {
+        socket.emit('readMessages', { roomId: activeRoom.id, userId });
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
+
+    // Initial check on mount or when activeRoom changes
+    handleFocus();
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
+    };
+  }, [activeRoom, socket, userId]);
+
   // Handle incoming messages
   useEffect(() => {
     if (!socket) return;
     
     const handleNewMessage = (msg) => {
       if (activeRoom && msg.roomId === activeRoom.id) {
-        // Emit read receipt if viewing the room and message is from recipient
+        // Emit read receipt if viewing the room, message is from recipient, and window is focused/visible
         const isFromMe = String(msg.senderId) === String(userId);
         if (!isFromMe) {
-          socket.emit('readMessages', { roomId: msg.roomId, userId });
+          const isFocused = document.hasFocus() && document.visibilityState === 'visible';
+          if (isFocused) {
+            socket.emit('readMessages', { roomId: msg.roomId, userId });
+          }
         }
 
         setMessages(prev => {
