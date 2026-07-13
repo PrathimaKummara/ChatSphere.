@@ -16,23 +16,48 @@ function openDB() {
 }
 
 async function saveToIDB(key, value) {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, 'readwrite');
-    tx.objectStore(STORE_NAME).put(value, key);
-    tx.oncomplete = () => resolve();
-    tx.onerror = (e) => reject(e.target.error);
-  });
+  // Always set in localStorage as a reliable backup (crucial for Incognito mode)
+  try {
+    localStorage.setItem(key, value);
+  } catch (e) {
+    console.error('localStorage save failed:', e);
+  }
+
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      tx.objectStore(STORE_NAME).put(value, key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = (e) => reject(e.target.error);
+    });
+  } catch (e) {
+    console.error('IndexedDB save failed:', e);
+  }
 }
 
 async function getFromIDB(key) {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, 'readonly');
-    const request = tx.objectStore(STORE_NAME).get(key);
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = (e) => reject(e.target.error);
-  });
+  // Try IndexedDB first
+  try {
+    const db = await openDB();
+    const result = await new Promise((resolve) => {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const request = tx.objectStore(STORE_NAME).get(key);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => resolve(null);
+    });
+    if (result) return result;
+  } catch (e) {
+    console.error('IndexedDB get failed:', e);
+  }
+
+  // Fallback to localStorage
+  try {
+    return localStorage.getItem(key);
+  } catch (e) {
+    console.error('localStorage get failed:', e);
+    return null;
+  }
 }
 
 // ── Key Helpers ───────────────────────────────────────────────────────────────
