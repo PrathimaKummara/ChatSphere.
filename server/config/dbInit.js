@@ -92,6 +92,36 @@ async function initDatabase() {
     `);
     console.log('RoomMembers table verified/created.');
 
+    // 7. Create DirectConversations Table
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS DirectConversations (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user1_id INT NOT NULL,
+        user2_id INT NOT NULL,
+        user1_cleared_at TIMESTAMP NULL DEFAULT NULL,
+        user2_cleared_at TIMESTAMP NULL DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user1_id) REFERENCES Users(id) ON DELETE CASCADE,
+        FOREIGN KEY (user2_id) REFERENCES Users(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB;
+    `);
+    console.log('DirectConversations table verified/created.');
+
+    // 8. Create MessageRequests Table
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS MessageRequests (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        from_user_id INT NOT NULL,
+        from_username VARCHAR(255) NOT NULL,
+        to_user_id INT NOT NULL,
+        status ENUM('pending', 'accepted', 'blocked') DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (from_user_id) REFERENCES Users(id) ON DELETE CASCADE,
+        FOREIGN KEY (to_user_id) REFERENCES Users(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB;
+    `);
+    console.log('MessageRequests table verified/created.');
+
     console.log('Database initialization completed successfully.');
   } catch (err) {
     console.error('Database initialization failed:', err);
