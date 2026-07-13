@@ -7,11 +7,17 @@ if (dns.setDefaultResultOrder) {
   dns.setDefaultResultOrder('ipv4first');
 }
 
+// Custom lookup function that forces Nodemailer to resolve IPv4 addresses
+const ipv4Lookup = (hostname, options, callback) => {
+  return dns.lookup(hostname, { ...options, family: 4 }, callback);
+};
+
 // Set up the Gmail SMTP transporter
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,
   secure: false, // Use STARTTLS (false) instead of SSL (true)
+  lookup: ipv4Lookup, // Force IPv4 resolution
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
