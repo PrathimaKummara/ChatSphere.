@@ -3,14 +3,19 @@ const nodemailer = require('nodemailer');
 
 // Set up the Gmail SMTP transporter
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false, // Use STARTTLS (false) instead of SSL (true)
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
   },
-  connectionTimeout: 8000, // 8 seconds connection timeout
-  greetingTimeout: 8000,   // 8 seconds SMTP greeting timeout
-  socketTimeout: 15000     // 15 seconds socket activity timeout
+  tls: {
+    rejectUnauthorized: false // Avoid potential certificate trust issues on Render
+  },
+  connectionTimeout: 10000, // 10 seconds connection timeout
+  greetingTimeout: 10000,   // 10 seconds SMTP greeting timeout
+  socketTimeout: 20000     // 20 seconds socket activity timeout
 });
 
 // Function to send the OTP email
