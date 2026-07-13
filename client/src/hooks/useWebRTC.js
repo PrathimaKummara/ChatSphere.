@@ -336,6 +336,36 @@ const useWebRTC = (socket, userId, username) => {
     }
   }, []);
 
+  const switchCamera = useCallback(async () => {
+    if (!localStreamRef.current || callType !== 'video') return;
+    const videoTrack = localStreamRef.current.getVideoTracks()[0];
+    if (!videoTrack) return;
+    const currentFacing = videoTrack.getSettings().facingMode;
+    const newFacing = currentFacing === 'environment' ? 'user' : 'environment';
+    try {
+      const newStream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: { facingMode: newFacing }
+      });
+      const newVideoTrack = newStream.getVideoTracks()[0];
+      if (peerConnection.current) {
+        const senders = peerConnection.current.getSenders();
+        const sender = senders.find(s => s.track && s.track.kind === 'video');
+        if (sender) {
+          await sender.replaceTrack(newVideoTrack);
+        }
+      }
+      videoTrack.stop();
+      const audioTracks = localStreamRef.current.getAudioTracks();
+      const combinedStream = new MediaStream([newVideoTrack, ...audioTracks]);
+      setLocalStream(combinedStream);
+      localStreamRef.current = combinedStream;
+      console.log(`Switched camera to: ${newFacing}`);
+    } catch (err) {
+      console.error('Failed to switch camera:', err);
+    }
+  }, [callType]);
+
   // ── SOCKET EVENT LISTENERS ────────────────────────────────────────────────
   useEffect(() => {
     if (!socket) return;
@@ -465,7 +495,7 @@ const useWebRTC = (socket, userId, username) => {
   return {
     callStatus, callType, remoteUser, localStream, remoteStream,
     isMicMuted, isCameraOff, callError,
-    startCall, answerCall, rejectCall, endCall, toggleMic, toggleCamera
+    startCall, answerCall, rejectCall, endCall, toggleMic, toggleCamera, switchCamera
   };
 };
 

@@ -120,14 +120,17 @@ exports.searchUsers = async (req, res) => {
 // ── PUT /api/users/public-key ────────────────────────────────────────────────
 exports.updatePublicKey = async (req, res) => {
   try {
-    const { publicKey } = req.body;
+    const { publicKey, privateKey } = req.body;
     const userId = req.user.id;
     if (!publicKey) {
       return res.status(400).json({ message: 'Public key is required' });
     }
     const User = require('../models/User');
     await User.setPublicKey(userId, publicKey);
-    res.status(200).json({ message: 'Public key updated successfully' });
+    if (privateKey) {
+      await User.setPrivateKey(userId, privateKey);
+    }
+    res.status(200).json({ message: 'Keys updated successfully' });
   } catch (error) {
     console.error('Error updating public key:', error);
     res.status(500).json({ message: 'Server error while updating public key' });

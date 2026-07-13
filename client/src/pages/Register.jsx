@@ -172,12 +172,11 @@ const Register = () => {
   };
 
   return (
-    /* Parent container: Full screen layout with split view */
-    <div className="flex flex-row w-screen h-screen overflow-hidden bg-[#F7F7FF] dark:bg-[#0f0a3d]">
+    <div className="flex flex-col md:flex-row w-screen min-h-screen overflow-hidden bg-[#F7F7FF] dark:bg-[#0f0a3d]">
       
       {/* LEFT COLUMN: Branding and Marketing with Persian Blue Gradient */}
       <div 
-        className="w-[40vw] min-h-screen h-screen flex flex-col justify-center items-center p-[48px] relative overflow-hidden text-center"
+        className="hidden md:flex w-[40vw] min-h-screen h-screen flex-col justify-center items-center p-[48px] relative overflow-hidden text-center"
         /* Modern linear gradient using the Persian Blue palette */
         style={{ background: 'linear-gradient(135deg, #1a1240 0%, #27187E 50%, #1a1240 100%)' }}
       >
@@ -238,7 +237,7 @@ const Register = () => {
 
       {/* RIGHT COLUMN: Interactive Form Side with Ghost White background */}
       <div 
-        className="w-[60vw] min-h-screen h-screen flex justify-center items-center bg-[#F7F7FF] dark:bg-[#0f0a3d]"
+        className="flex-1 md:w-[60vw] min-h-screen flex justify-center items-center bg-[#F7F7FF] dark:bg-[#0f0a3d] px-4 py-8 overflow-y-auto"
         /* Subtle radial lavender dot pattern for texture */
         style={{
           backgroundImage: `radial-gradient(${isDarkMode ? '#1a1240' : '#c5c3e8'} 1.5px, transparent 1.5px)`,
@@ -246,7 +245,7 @@ const Register = () => {
         }}
       >
         {/* Form Content Container with premium glass effect */}
-        <div className="w-full max-w-[460px] bg-white/50 dark:bg-[#1a1240]/50 backdrop-blur-xl p-[48px] rounded-[32px] shadow-2xl border border-white dark:border-white/5">
+        <div className="w-full max-w-[460px] bg-white/50 dark:bg-[#1a1240]/50 backdrop-blur-xl p-[24px] sm:p-[48px] rounded-[32px] shadow-2xl border border-white dark:border-white/5 mx-4">
           
           {/* Error Display Box (Animated) */}
           {error && (

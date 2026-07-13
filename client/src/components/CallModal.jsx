@@ -7,12 +7,40 @@ import {
 const CallModal = ({ 
   status, type, remoteUser, localStream, remoteStream, 
   isMicMuted, isCameraOff, callError,
-  onAnswer, onReject, onEnd, onToggleMic, onToggleCamera 
+  onAnswer, onReject, onEnd, onToggleMic, onToggleCamera, onSwitchCamera
 }) => {
   const [isSpeakerOff, setIsSpeakerOff] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
+
+  // Draggable preview window state and handlers
+  const [previewPos, setPreviewPos] = useState({ x: 20, y: 80 }); // start 20px from right, 80px from top
+  const isDragging = useRef(false);
+  const dragStart = useRef({ x: 0, y: 0 });
+  const previewStart = useRef({ x: 20, y: 80 });
+
+  const handlePointerDown = (e) => {
+    isDragging.current = true;
+    dragStart.current = { x: e.clientX, y: e.clientY };
+    previewStart.current = { ...previewPos };
+    e.target.setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = (e) => {
+    if (!isDragging.current) return;
+    const dx = e.clientX - dragStart.current.x;
+    const dy = e.clientY - dragStart.current.y;
+    // dx is inverted because position x is mapped to 'right' style property
+    setPreviewPos({
+      x: Math.max(10, previewStart.current.x - dx),
+      y: Math.max(10, previewStart.current.y + dy)
+    });
+  };
+
+  const handlePointerUp = () => {
+    isDragging.current = false;
+  };
 
   // Handle call timer
   useEffect(() => {
@@ -156,8 +184,17 @@ const CallModal = ({
               <>
                 <video ref={remoteVideoRef} autoPlay playsInline className="w-full h-full object-cover" />
                 {!isCameraOff && (
-                  <div className="absolute top-8 right-8 w-32 h-44 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl bg-gray-900 z-50">
-                    <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover -scale-x-100" />
+                  <div 
+                    onPointerDown={handlePointerDown}
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
+                    className="absolute w-28 h-36 sm:w-32 sm:h-44 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl bg-gray-900 z-50 cursor-move touch-none select-none"
+                    style={{ 
+                      top: `${previewPos.y}px`, 
+                      right: `${previewPos.x}px` 
+                    }}
+                  >
+                    <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover -scale-x-100 pointer-events-none" />
                   </div>
                 )}
               </>
@@ -212,7 +249,7 @@ const CallModal = ({
                   className={`p-3 sm:p-4 rounded-full transition-all border-none cursor-pointer ${isCameraOff ? 'bg-red-500 text-white' : 'bg-white/10 hover:bg-white/20 text-white'}`} title="Toggle Camera">
                   {isCameraOff ? <VideoOff className="w-5 h-5 sm:w-6 sm:h-6" /> : <Video className="w-5 h-5 sm:w-6 sm:h-6" />}
                 </button>
-                <button className="hidden sm:block p-3 sm:p-4 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all border-none cursor-pointer">
+                <button onClick={onSwitchCamera} className="p-3 sm:p-4 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all border-none cursor-pointer" title="Switch Camera">
                   <RotateCcw className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
               </>

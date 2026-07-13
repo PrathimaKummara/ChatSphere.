@@ -447,7 +447,7 @@ const ChatWindow = ({
           <div className="flex-1 relative">
             <input ref={inputRef} type="text" value={inputText}
               onChange={(e) => { setInputText(e.target.value); sendTypingIndicator(activeRoom.id); }}
-              placeholder={recipientPublicKey ? "🔒 End-to-end encrypted..." : "Type a message..."}
+              placeholder="Type a message..."
               className="w-full bg-gray-100 dark:bg-brand-gray-medium border-none rounded-full py-3 px-5 focus:ring-2 focus:ring-brand-purple/50 outline-none transition-all dark:text-white" />
           </div>
           <button type="submit" disabled={isUploading}

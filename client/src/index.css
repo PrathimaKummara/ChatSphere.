@@ -21,10 +21,17 @@
   --whatsapp-beige: #efeae2;
 }
 
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
 /* Global body styles */
 body {
   min-width: 320px;
-  min-height: 100vh;
   /* Default light mode background */
   background-color: #f7f7ff;
   color: #1a1240;

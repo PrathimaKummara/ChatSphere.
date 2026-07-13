@@ -60,8 +60,8 @@ const Login = () => {
       localStorage.setItem('userId', response.data.id);
       localStorage.setItem('profile_pic', response.data.profile_pic || '');
       
-      // Initialize E2EE (generate keypair if missing, upload public key)
-      await initE2EE(api);
+      // Initialize E2EE (restore keypair if fetched from server, or generate and upload)
+      await initE2EE(api, response.data.publicKey, response.data.privateKey);
       
       navigate('/');
     } catch (err) {
@@ -176,7 +176,7 @@ const Login = () => {
 
       {/* RIGHT COLUMN: Form — full width on mobile, 60vw on desktop */}
       <div 
-        className="flex-1 md:w-[60vw] min-h-screen flex justify-center items-center bg-[#F7F7FF] dark:bg-[#0f0a3d] px-4 py-8"
+        className="flex-1 md:w-[60vw] min-h-screen flex justify-center items-center bg-[#F7F7FF] dark:bg-[#0f0a3d] px-4 py-8 overflow-y-auto"
         style={{
           backgroundImage: `radial-gradient(${isDarkMode ? '#1a1240' : '#c5c3e8'} 1.5px, transparent 1.5px)`,
           backgroundSize: '24px 24px'

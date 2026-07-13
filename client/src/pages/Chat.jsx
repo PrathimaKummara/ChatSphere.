@@ -25,7 +25,7 @@ const Chat = () => {
   const { 
     callStatus, callType, remoteUser, localStream, remoteStream,
     isMicMuted, isCameraOff, callError,
-    startCall, answerCall, rejectCall, endCall, toggleMic, toggleCamera
+    startCall, answerCall, rejectCall, endCall, toggleMic, toggleCamera, switchCamera
   } = useWebRTC(socket, userId, username);
 
   // Redirect if not authenticated (using an effect for safety, though ProtectedRoute handles this)
@@ -244,6 +244,7 @@ const Chat = () => {
         onEnd={endCall}
         onToggleMic={toggleMic} 
         onToggleCamera={toggleCamera}
+        onSwitchCamera={switchCamera}
       />
 
       {/* SETTINGS PANEL — slide-in from left, overlays sidebar */}

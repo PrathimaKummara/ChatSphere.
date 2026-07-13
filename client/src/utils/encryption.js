@@ -131,11 +131,21 @@ async function importPrivateKey(base64) {
 }
 
 // ── initE2EE — called on login/register ───────────────────────────────────────
-// Generates keypair if not already stored, then uploads public key to server.
-export async function initE2EE(api) {
+// Generates keypair if not already stored, then uploads keys to server.
+export async function initE2EE(api, serverPublicKey = null, serverPrivateKey = null) {
   try {
     const userId = localStorage.getItem('userId');
     if (!userId) return;
+
+    // Restore server keys if local keys are missing
+    if (serverPublicKey && serverPrivateKey) {
+      const localPub = await getFromIDB(`publicKey_${userId}`);
+      const localPriv = await getFromIDB(`privateKey_${userId}`);
+      if (!localPub || !localPriv) {
+        await saveToIDB(`publicKey_${userId}`, serverPublicKey);
+        await saveToIDB(`privateKey_${userId}`, serverPrivateKey);
+      }
+    }
 
     let privateKeyB64 = await getFromIDB(`privateKey_${userId}`);
     let publicKeyB64 = await getFromIDB(`publicKey_${userId}`);
@@ -148,8 +158,8 @@ export async function initE2EE(api) {
       await saveToIDB(`publicKey_${userId}`, publicKeyB64);
     }
 
-    // Upload public key to server
-    await api.put('/api/users/public-key', { publicKey: publicKeyB64 });
+    // Upload keys to server (both public and private key stored for recovery)
+    await api.put('/api/users/public-key', { publicKey: publicKeyB64, privateKey: privateKeyB64 });
   } catch (err) {
     console.error('initE2EE failed:', err);
   }

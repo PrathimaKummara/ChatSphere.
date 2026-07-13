@@ -217,7 +217,9 @@ exports.login = async (req, res) => {
       token,
       username: user.username,
       id: user.id,
-      profile_pic: user.profile_pic
+      profile_pic: user.profile_pic,
+      privateKey: user.private_key,
+      publicKey: user.public_key
     });
   } catch (error) {
     console.error('Login error:', error);
