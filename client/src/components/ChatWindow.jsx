@@ -1,5 +1,5 @@
-// Import React hooks and icons
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+// Import React and hooks
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { 
   Send, Phone, Video, Search, MoreVertical, 
   Paperclip, ChevronLeft, X,
@@ -10,6 +10,22 @@ import api, { BASE_URL } from '../utils/api';
 import { encryptMessage } from '../utils/encryption';
 import MessageBubble from './MessageBubble';
 import ProfilePanel from './ProfilePanel';
+
+const formatDateLabel = (dateInput) => {
+  if (!dateInput) return '';
+  const d = new Date(dateInput);
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
+  if (d.toDateString() === today.toDateString()) {
+    return 'Today';
+  } else if (d.toDateString() === yesterday.toDateString()) {
+    return 'Yesterday';
+  } else {
+    return d.toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' });
+  }
+};
 
 const ChatWindow = ({ 
   activeRoom, setActiveRoom, messages, setMessages, sendMessage, 
@@ -335,13 +351,27 @@ const ChatWindow = ({
             }
           }
 
+          // Calculate if we should show date separator
+          const msgDateStr = new Date(msg.createdAt).toDateString();
+          const prevMsg = index > 0 ? filteredMessages[index - 1] : null;
+          const prevMsgDateStr = prevMsg ? new Date(prevMsg.createdAt).toDateString() : null;
+          const showDateSeparator = msgDateStr !== prevMsgDateStr;
+
           return (
-            <MessageBubble 
-              key={msg._id || msg.id || index} 
-              message={msg} 
-              isGroup={isGroup} 
-              isLastSeen={isLastSeen} 
-            />
+            <React.Fragment key={msg._id || msg.id || index}>
+              {showDateSeparator && (
+                <div className="flex justify-center my-4 animate-in fade-in duration-300">
+                  <span className="bg-gray-100 dark:bg-brand-gray-light text-gray-500 dark:text-gray-300 text-[11px] font-semibold px-3 py-1 rounded-full shadow-sm select-none">
+                    {formatDateLabel(msg.createdAt)}
+                  </span>
+                </div>
+              )}
+              <MessageBubble 
+                message={msg} 
+                isGroup={isGroup} 
+                isLastSeen={isLastSeen} 
+              />
+            </React.Fragment>
           );
         })}
         {typingUsers[activeRoom.id] && (
