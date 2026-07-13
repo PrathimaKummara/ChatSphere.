@@ -277,8 +277,16 @@ const ChatWindow = ({
               <h3 className="font-bold text-[14px] md:text-lg text-brand-black dark:text-white truncate leading-tight">
                 {activeRoom.name}
               </h3>
-              <p className={`text-[11px] font-semibold truncate ${onlineUsers[activeRoom.otherUserId] ? 'text-[#25d366]' : 'text-gray-400 dark:text-gray-500'}`}>
-                {onlineUsers[activeRoom.otherUserId] ? 'Online' : 'Offline'}
+              <p className="text-[11px] font-semibold truncate flex items-center gap-1">
+                <span className={onlineUsers[activeRoom.otherUserId] ? 'text-[#25d366]' : 'text-gray-400 dark:text-gray-500'}>
+                  {onlineUsers[activeRoom.otherUserId] ? 'Online' : 'Offline'}
+                </span>
+                {recipientPublicKey && (
+                  <>
+                    <span className="text-gray-300 dark:text-gray-600">•</span>
+                    <span className="text-gray-400 dark:text-gray-500 flex items-center gap-0.5"><span className="text-[10px]">🔒</span> E2EE</span>
+                  </>
+                )}
               </p>
             </div>
           </button>
@@ -356,6 +364,13 @@ const ChatWindow = ({
           </div>
         ) : (
           <div className="mt-auto w-full space-y-1">
+            {recipientPublicKey && (
+              <div className="flex justify-center my-4 animate-in fade-in duration-500">
+                <div className="bg-[#ffeecd]/60 dark:bg-yellow-950/10 text-[#655028] dark:text-yellow-400/80 text-[11px] font-bold px-4 py-2.5 rounded-2xl shadow-sm border border-yellow-100/40 dark:border-yellow-950/20 max-w-[85%] text-center flex items-center gap-2 select-none">
+                  <span>🔒 Messages and calls are end-to-end encrypted. No one outside of this chat, not even ChatSphere, can read or listen to them.</span>
+                </div>
+              </div>
+            )}
             {filteredMessages.map((msg, index) => {
               const isGroup = activeRoom?.id && !activeRoom.id.toString().startsWith('dm_');
               
@@ -432,7 +447,7 @@ const ChatWindow = ({
           <div className="flex-1 relative">
             <input ref={inputRef} type="text" value={inputText}
               onChange={(e) => { setInputText(e.target.value); sendTypingIndicator(activeRoom.id); }}
-              placeholder="Type a message..."
+              placeholder={recipientPublicKey ? "🔒 End-to-end encrypted..." : "Type a message..."}
               className="w-full bg-gray-100 dark:bg-brand-gray-medium border-none rounded-full py-3 px-5 focus:ring-2 focus:ring-brand-purple/50 outline-none transition-all dark:text-white" />
           </div>
           <button type="submit" disabled={isUploading}
