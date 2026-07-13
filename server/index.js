@@ -1,6 +1,12 @@
 // Load environment variables from the .env file into process.env
 require('dotenv').config();
 
+// Force DNS resolution to prioritize IPv4 globally (avoids IPv6 connection errors on IPv4-only cloud hosts like Render)
+const dns = require('dns');
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
+
 // Import the Express framework for handling HTTP requests
 const express = require('express');
 // Import the built-in HTTP module to create a server
