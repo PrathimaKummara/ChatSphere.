@@ -330,6 +330,16 @@ const Settings = ({ isOpen, initialView = 'settings', onClose, onUpdateName, onU
               </div>
               {nameSuccess && <p className="text-[10px] text-green-500 font-bold mt-1">✓ Name updated successfully</p>}
             </div>
+
+            {/* Email Address Display Card (Read Only) */}
+            {localStorage.getItem('email') && (
+              <div className="mx-2 bg-white dark:bg-brand-gray-dark p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm space-y-2">
+                <span className="text-[11px] font-bold text-brand-purple uppercase tracking-wider block">Email Address</span>
+                <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 select-all truncate px-4 py-2.5 bg-gray-50 dark:bg-brand-black/40 rounded-xl border border-gray-100 dark:border-white/5">
+                  {localStorage.getItem('email')}
+                </p>
+              </div>
+            )}
             
             {/* About / Bio Input Card */}
             <div className="mx-2 bg-white dark:bg-brand-gray-dark p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm space-y-3">

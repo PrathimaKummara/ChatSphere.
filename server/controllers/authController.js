@@ -104,6 +104,7 @@ exports.verifyOtp = async (req, res) => {
       message: 'User registered successfully', 
       token,
       username: username,
+      email: email,
       id: newUserId,
       profile_pic: null // New users have no pic yet
     });
@@ -181,6 +182,7 @@ exports.resetPassword = async (req, res) => {
       message: 'Password reset successful', 
       token,
       username: user.username,
+      email: user.email,
       id: user.id,
       profile_pic: user.profile_pic
     });
@@ -216,6 +218,7 @@ exports.login = async (req, res) => {
       message: 'Login successful', 
       token,
       username: user.username,
+      email: user.email,
       id: user.id,
       profile_pic: user.profile_pic,
       privateKey: user.private_key,

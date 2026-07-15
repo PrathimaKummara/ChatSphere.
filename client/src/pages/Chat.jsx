@@ -59,6 +59,12 @@ const Chat = () => {
         setProfilePic(res.data.profile_pic);
         localStorage.setItem('profile_pic', res.data.profile_pic || '');
       }
+      if (res.data.email) {
+        localStorage.setItem('email', res.data.email);
+      }
+      if (res.data.about) {
+        localStorage.setItem('about', res.data.about);
+      }
     }).catch(() => {});
   }, [userId]);
 

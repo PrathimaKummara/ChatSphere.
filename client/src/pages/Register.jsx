@@ -157,6 +157,7 @@ const Register = () => {
       localStorage.setItem('username', response.data.username);
       localStorage.setItem('userId', response.data.id);
       localStorage.setItem('profile_pic', response.data.profile_pic || '');
+      localStorage.setItem('email', response.data.email || email);
       
       // Initialize E2EE (generate keypair if missing, upload public key)
       await initE2EE(api);

@@ -59,6 +59,7 @@ const Login = () => {
       localStorage.setItem('username', response.data.username);
       localStorage.setItem('userId', response.data.id);
       localStorage.setItem('profile_pic', response.data.profile_pic || '');
+      localStorage.setItem('email', response.data.email || email);
       
       // Initialize E2EE (restore keypair if fetched from server, or generate and upload)
       await initE2EE(api, response.data.publicKey, response.data.privateKey);
@@ -102,6 +103,7 @@ const Login = () => {
       localStorage.setItem('username', response.data.username);
       localStorage.setItem('userId', response.data.id);
       localStorage.setItem('profile_pic', response.data.profile_pic || '');
+      localStorage.setItem('email', response.data.email || resetEmail);
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to reset password.');
