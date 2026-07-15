@@ -281,12 +281,6 @@ const ChatWindow = ({
                 <span className={onlineUsers[activeRoom.otherUserId] ? 'text-[#25d366]' : 'text-gray-400 dark:text-gray-500'}>
                   {onlineUsers[activeRoom.otherUserId] ? 'Online' : 'Offline'}
                 </span>
-                {recipientPublicKey && (
-                  <>
-                    <span className="text-gray-300 dark:text-gray-600">•</span>
-                    <span className="text-gray-400 dark:text-gray-500 flex items-center gap-0.5"><span className="text-[10px]">🔒</span> E2EE</span>
-                  </>
-                )}
               </p>
             </div>
           </button>
@@ -367,7 +361,7 @@ const ChatWindow = ({
             {recipientPublicKey && (
               <div className="flex justify-center my-4 animate-in fade-in duration-500">
                 <div className="bg-[#ffeecd]/60 dark:bg-yellow-950/10 text-[#655028] dark:text-yellow-400/80 text-[11px] font-bold px-4 py-2.5 rounded-2xl shadow-sm border border-yellow-100/40 dark:border-yellow-950/20 max-w-[85%] text-center flex items-center gap-2 select-none">
-                  <span>🔒 Messages and calls are end-to-end encrypted. No one outside of this chat, not even ChatSphere, can read or listen to them.</span>
+                  <span>🔒 Messages and calls are end-to-end encrypted.</span>
                 </div>
               </div>
             )}
