@@ -158,7 +158,7 @@ const Settings = ({ isOpen, initialView = 'settings', onClose, onUpdateName, onU
                 <div className="w-14 h-14 rounded-full flex items-center justify-center text-white font-extrabold text-lg overflow-hidden shadow-md ring-2 ring-brand-purple ring-offset-2 dark:ring-offset-brand-gray-dark transition-all duration-300 group-hover:ring-4 relative bg-brand-purple">
                   {profilePic && (
                     <img 
-                      src={`${BASE_URL}${profilePic}`} 
+                      src={profilePic.startsWith('data:') ? profilePic : `${BASE_URL}${profilePic}`} 
                       className="w-full h-full object-cover absolute top-0 left-0 animate-in fade-in duration-300" 
                       onError={(e) => {
                         e.target.style.display = 'none';
@@ -244,7 +244,7 @@ const Settings = ({ isOpen, initialView = 'settings', onClose, onUpdateName, onU
                     <>
                       {profilePic && (
                         <img 
-                          src={`${BASE_URL}${profilePic}`} 
+                          src={profilePic.startsWith('data:') ? profilePic : `${BASE_URL}${profilePic}`} 
                           className="w-full h-full object-cover absolute top-0 left-0 animate-in fade-in duration-300" 
                           onError={(e) => {
                             e.target.style.display = 'none';

@@ -252,7 +252,7 @@ const ChatWindow = ({
               <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm overflow-hidden relative bg-brand-purple">
                 {activeRoom.profile_pic && (
                   <img 
-                    src={`${BASE_URL}${activeRoom.profile_pic}`} 
+                    src={activeRoom.profile_pic.startsWith('data:') ? activeRoom.profile_pic : `${BASE_URL}${activeRoom.profile_pic}`} 
                     className="w-full h-full object-cover rounded-full absolute top-0 left-0 animate-in fade-in duration-300" 
                     onError={(e) => {
                       e.target.style.display = 'none';

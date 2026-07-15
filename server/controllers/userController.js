@@ -76,9 +76,26 @@ exports.uploadAvatar = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
     const userId = req.user.id;
-    const fileUrl = `/uploads/avatars/${req.file.filename}`;
-    await db.query('UPDATE Users SET profile_pic = ? WHERE id = ?', [fileUrl, userId]);
-    res.status(200).json({ message: 'Avatar updated successfully', profile_pic: fileUrl });
+    
+    // Ensure column is LONGTEXT to support Base64 strings
+    try {
+      await db.query('ALTER TABLE Users MODIFY COLUMN profile_pic LONGTEXT DEFAULT NULL');
+    } catch (_) {}
+
+    const fs = require('fs');
+    const fileBuffer = fs.readFileSync(req.file.path);
+    const mimeType = req.file.mimetype;
+    const base64Data = fileBuffer.toString('base64');
+    const dataUrl = `data:${mimeType};base64,${base64Data}`;
+
+    await db.query('UPDATE Users SET profile_pic = ? WHERE id = ?', [dataUrl, userId]);
+
+    // Unlink ephemeral temporary file
+    try {
+      fs.unlinkSync(req.file.path);
+    } catch (_) {}
+
+    res.status(200).json({ message: 'Avatar updated successfully', profile_pic: dataUrl });
   } catch (error) {
     console.error('Error uploading avatar:', error);
     res.status(500).json({ message: 'Server error while uploading avatar' });

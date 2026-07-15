@@ -11,8 +11,13 @@ const CallModal = ({
 }) => {
   const [isSpeakerOff, setIsSpeakerOff] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
+
+  useEffect(() => {
+    setIsMobile(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+  }, []);
 
   // Draggable preview window state and handlers
   const [previewPos, setPreviewPos] = useState({ x: 20, y: 80 }); // start 20px from right, 80px from top
@@ -249,9 +254,11 @@ const CallModal = ({
                   className={`p-3 sm:p-4 rounded-full transition-all border-none cursor-pointer ${isCameraOff ? 'bg-red-500 text-white' : 'bg-white/10 hover:bg-white/20 text-white'}`} title="Toggle Camera">
                   {isCameraOff ? <VideoOff className="w-5 h-5 sm:w-6 sm:h-6" /> : <Video className="w-5 h-5 sm:w-6 sm:h-6" />}
                 </button>
-                <button onClick={onSwitchCamera} className="p-3 sm:p-4 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all border-none cursor-pointer" title="Switch Camera">
-                  <RotateCcw className="w-5 h-5 sm:w-6 sm:h-6" />
-                </button>
+                {isMobile && (
+                  <button onClick={onSwitchCamera} className="p-3 sm:p-4 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all border-none cursor-pointer" title="Switch Camera">
+                    <RotateCcw className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </button>
+                )}
               </>
             )}
 

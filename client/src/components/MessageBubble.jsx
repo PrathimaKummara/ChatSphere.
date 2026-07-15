@@ -162,7 +162,7 @@ const MessageBubble = ({ message, onAvatarClick, isGroup, isLastSeen }) => {
         <div onClick={() => onAvatarClick && onAvatarClick(message.senderId)} className="w-8 h-8 rounded-full bg-[#6c3bd4] flex items-center justify-center text-white text-[10px] font-bold mb-1 mr-2 cursor-pointer shadow-sm flex-shrink-0 overflow-hidden relative">
           {message.senderProfilePic && (
             <img 
-              src={`${BASE_URL}${message.senderProfilePic}`} 
+              src={message.senderProfilePic?.startsWith('data:') ? message.senderProfilePic : `${BASE_URL}${message.senderProfilePic}`} 
               className="w-full h-full object-cover absolute top-0 left-0 animate-in fade-in duration-300" 
               onError={(e) => {
                 e.target.style.display = 'none';
