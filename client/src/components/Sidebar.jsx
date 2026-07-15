@@ -341,7 +341,7 @@ const Sidebar = ({ activeRoom, setActiveRoom, onlineUsers, username, profilePic,
           <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-brand-purple text-white font-bold text-lg shadow-sm border-2 border-white dark:border-brand-black relative">
             {profilePic && (
               <img 
-                src={profilePic?.startsWith('data:') ? profilePic : `${BASE_URL}${profilePic}`} 
+                src={profilePic && /^(https?:\/\/|data:)/.test(profilePic) ? profilePic : `${BASE_URL}${profilePic}`} 
                 className="w-full h-full object-cover absolute top-0 left-0 animate-in fade-in duration-300" 
                 onError={(e) => {
                   e.target.style.display = 'none';
@@ -452,7 +452,7 @@ const Sidebar = ({ activeRoom, setActiveRoom, onlineUsers, username, profilePic,
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-lg shadow-sm overflow-hidden relative ${getAvatarColor(conv.name)}`}>
                     {conv.profile_pic && (
                       <img 
-                        src={conv.profile_pic.startsWith('data:') ? conv.profile_pic : `${BASE_URL}${conv.profile_pic}`} 
+                        src={/^(https?:\/\/|data:)/.test(conv.profile_pic) ? conv.profile_pic : `${BASE_URL}${conv.profile_pic}`} 
                         className="w-full h-full object-cover absolute top-0 left-0 animate-in fade-in duration-300" 
                         onError={(e) => {
                           e.target.style.display = 'none';
@@ -502,7 +502,7 @@ const Sidebar = ({ activeRoom, setActiveRoom, onlineUsers, username, profilePic,
               <div className={`w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center text-white text-lg overflow-hidden relative ${getAvatarColor(call.otherPerson.name)}`}>
                 {call.otherPerson.profile_pic && (
                   <img 
-                    src={call.otherPerson.profile_pic.startsWith('data:') ? call.otherPerson.profile_pic : `${BASE_URL}${call.otherPerson.profile_pic}`} 
+                    src={/^(https?:\/\/|data:)/.test(call.otherPerson.profile_pic) ? call.otherPerson.profile_pic : `${BASE_URL}${call.otherPerson.profile_pic}`} 
                     className="w-full h-full object-cover absolute top-0 left-0 animate-in fade-in duration-300" 
                     onError={(e) => {
                       e.target.style.display = 'none';
@@ -591,7 +591,7 @@ const Sidebar = ({ activeRoom, setActiveRoom, onlineUsers, username, profilePic,
               <div className={`relative w-24 h-24 rounded-full flex items-center justify-center text-white text-3xl font-bold mb-4 shadow-xl overflow-hidden ring-4 ring-white dark:ring-brand-gray-dark ${getAvatarColor(selectedCallUser.name)}`}>
                 {selectedCallUser.profile_pic && (
                   <img 
-                    src={selectedCallUser.profile_pic.startsWith('data:') ? selectedCallUser.profile_pic : `${BASE_URL}${selectedCallUser.profile_pic}`} 
+                    src={/^(https?:\/\/|data:)/.test(selectedCallUser.profile_pic) ? selectedCallUser.profile_pic : `${BASE_URL}${selectedCallUser.profile_pic}`} 
                     className="w-full h-full object-cover absolute top-0 left-0 rounded-full animate-in fade-in duration-300" 
                     onError={(e) => {
                       e.target.style.display = 'none';
@@ -654,7 +654,7 @@ const Sidebar = ({ activeRoom, setActiveRoom, onlineUsers, username, profilePic,
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold overflow-hidden relative ${getAvatarColor(user.username)}`}>
                   {user.profile_pic && (
                     <img 
-                      src={user.profile_pic.startsWith('data:') ? user.profile_pic : `${BASE_URL}${user.profile_pic}`} 
+                      src={/^(https?:\/\/|data:)/.test(user.profile_pic) ? user.profile_pic : `${BASE_URL}${user.profile_pic}`} 
                       className="w-full h-full object-cover absolute top-0 left-0 animate-in fade-in duration-300" 
                       onError={(e) => {
                         e.target.style.display = 'none';

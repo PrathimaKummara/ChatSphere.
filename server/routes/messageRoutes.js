@@ -2,11 +2,11 @@ const express = require('express');
 const router = express.Router();
 const messageController = require('../controllers/messageController');
 const authMiddleware = require('../middleware/authMiddleware');
-const upload = require('../middleware/uploadMiddleware');
+const { uploadMedia } = require('../middleware/uploadMiddleware');
 
 // ── Media upload ──────────────────────────────────────────────────────────────
 // POST /api/messages/upload
-router.post('/upload', authMiddleware, upload.single('file'), messageController.uploadMedia);
+router.post('/upload', authMiddleware, uploadMedia.single('file'), messageController.uploadMedia);
 
 // ── Direct Messaging routes ───────────────────────────────────────────────────
 // These MUST come before /:roomId to avoid route conflicts

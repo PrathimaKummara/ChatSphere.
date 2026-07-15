@@ -3,7 +3,7 @@ const router = express.Router();
 const { onlineUsers } = require('../socket/socketHandler');
 const userController = require('../controllers/userController');
 const authMiddleware = require('../middleware/authMiddleware');
-const upload = require('../middleware/uploadMiddleware');
+const { uploadAvatar } = require('../middleware/uploadMiddleware');
 
 // GET /api/users/online — list of currently online users
 router.get('/online', (req, res) => {
@@ -33,7 +33,7 @@ router.put('/public-key', authMiddleware, userController.updatePublicKey);
 router.get('/public-key/:userId', authMiddleware, userController.getPublicKey);
 
 // POST /api/users/upload-avatar — upload a new profile picture
-router.post('/upload-avatar', authMiddleware, upload.single('avatar'), userController.uploadAvatar);
+router.post('/upload-avatar', authMiddleware, uploadAvatar.single('avatar'), userController.uploadAvatar);
 
 // POST /api/users/block — block a user
 router.post('/block', authMiddleware, userController.blockUser);

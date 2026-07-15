@@ -205,7 +205,7 @@ const ProfilePanel = ({ user, onClose, onlineUsers = {}, startCall, onOpenSearch
             <div className={`w-28 h-28 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-xl overflow-hidden relative ${avatarColor}`}>
               {profile?.profile_pic && (
                 <img 
-                  src={profile.profile_pic.startsWith('data:') ? profile.profile_pic : `${BASE_URL}${profile.profile_pic}`} 
+                  src={/^(https?:\/\/|data:)/.test(profile.profile_pic) ? profile.profile_pic : `${BASE_URL}${profile.profile_pic}`} 
                   className="w-full h-full object-cover absolute top-0 left-0 animate-in fade-in duration-300" 
                   onError={(e) => {
                     e.target.style.display = 'none';
