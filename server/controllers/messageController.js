@@ -13,19 +13,7 @@ exports.getMessages = async (req, res) => {
     if (isDirect) {
       const convId = roomId.toString().replace('dm_', '');
       
-      // Ensure columns exist (Migration)
-      try {
-        const [columns] = await db.query('SHOW COLUMNS FROM DirectConversations');
-        const columnNames = columns.map(c => c.Field);
-        if (!columnNames.includes('user1_cleared_at')) {
-          await db.query('ALTER TABLE DirectConversations ADD COLUMN user1_cleared_at TIMESTAMP NULL DEFAULT NULL');
-        }
-        if (!columnNames.includes('user2_cleared_at')) {
-          await db.query('ALTER TABLE DirectConversations ADD COLUMN user2_cleared_at TIMESTAMP NULL DEFAULT NULL');
-        }
-      } catch (e) {
-        console.error('Migration error in getMessages:', e.message);
-      }
+
 
       // Fetch cleared_at for the current user
       const [convs] = await db.query(
@@ -311,19 +299,7 @@ exports.getDirectConversations = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // Ensure columns exist (Migration)
-    try {
-      const [columns] = await db.query('SHOW COLUMNS FROM DirectConversations');
-      const columnNames = columns.map(c => c.Field);
-      if (!columnNames.includes('user1_cleared_at')) {
-        await db.query('ALTER TABLE DirectConversations ADD COLUMN user1_cleared_at TIMESTAMP NULL DEFAULT NULL');
-      }
-      if (!columnNames.includes('user2_cleared_at')) {
-        await db.query('ALTER TABLE DirectConversations ADD COLUMN user2_cleared_at TIMESTAMP NULL DEFAULT NULL');
-      }
-    } catch (e) {
-      console.error('Migration error:', e.message);
-    }
+
 
     // Try with BlockedUsers JOIN — falls back if table doesn't exist yet
     let convos;

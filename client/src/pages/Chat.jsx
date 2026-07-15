@@ -102,7 +102,13 @@ const Chat = () => {
 
   // Load message history when room changes
   useEffect(() => {
-    if (!activeRoom) return;
+    if (!activeRoom) {
+      setMessages([]);
+      return;
+    }
+    
+    // Instantly clear previous room messages to eliminate UI transition lag
+    setMessages([]);
     
     const fetchHistory = async () => {
       try {

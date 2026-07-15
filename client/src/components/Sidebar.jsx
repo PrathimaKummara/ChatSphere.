@@ -671,9 +671,10 @@ const Sidebar = ({ activeRoom, setActiveRoom, onlineUsers, username, profilePic,
                     {user.username?.charAt(0).toUpperCase()}
                   </div>
                 </div>
-                <div className="text-left">
-                  <p className="font-bold text-sm dark:text-white">{user.username}</p>
-                  {onlineUsers[user.id] && <p className="text-xs text-green-500">Online</p>}
+                <div className="text-left min-w-0 flex-1">
+                  <p className="font-bold text-sm dark:text-white truncate leading-tight">{user.username}</p>
+                  <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate mt-0.5 font-medium">{user.email}</p>
+                  {onlineUsers[user.id] && <p className="text-xs text-green-500 mt-0.5">Online</p>}
                 </div>
               </button>
             ))}
