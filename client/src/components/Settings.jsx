@@ -239,7 +239,7 @@ const Settings = ({ isOpen, initialView = 'settings', onClose, onUpdateName, onU
               >
                 <div className="w-32 h-32 rounded-full bg-gray-100 dark:bg-brand-gray-medium flex items-center justify-center overflow-hidden ring-4 ring-brand-purple/20 shadow-lg relative">
                   {avatarPreview ? (
-                    <img src={avatarPreview} className="w-full h-full object-cover" alt="" />
+                    <img src={avatarPreview} className="w-full h-full object-cover absolute top-0 left-0 rounded-full animate-in fade-in duration-300" alt="" />
                   ) : (
                     <>
                       {profilePic && (
