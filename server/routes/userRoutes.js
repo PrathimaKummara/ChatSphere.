@@ -35,6 +35,9 @@ router.get('/public-key/:userId', authMiddleware, userController.getPublicKey);
 // POST /api/users/upload-avatar — upload a new profile picture
 router.post('/upload-avatar', authMiddleware, uploadAvatar.single('avatar'), userController.uploadAvatar);
 
+// DELETE /api/users/avatar — delete current user's profile picture
+router.delete('/avatar', authMiddleware, userController.deleteAvatar);
+
 // POST /api/users/block — block a user
 router.post('/block', authMiddleware, userController.blockUser);
 

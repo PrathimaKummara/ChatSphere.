@@ -90,6 +90,21 @@ exports.uploadAvatar = async (req, res) => {
   }
 };
 
+// ── DELETE /api/users/avatar ──────────────────────────────────────────────────
+exports.deleteAvatar = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Update profile_pic to NULL in database
+    await db.query('UPDATE Users SET profile_pic = NULL WHERE id = ?', [userId]);
+
+    res.status(200).json({ message: 'Avatar removed successfully', profile_pic: null });
+  } catch (error) {
+    console.error('Error removing avatar:', error);
+    res.status(500).json({ message: 'Server error while removing avatar' });
+  }
+};
+
 // ── GET /api/users/search?q=query ─────────────────────────────────────────────
 exports.searchUsers = async (req, res) => {
   try {

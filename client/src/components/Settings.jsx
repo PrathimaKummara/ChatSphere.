@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import api, { BASE_URL } from '../utils/api';
-import { Camera, LogOut, Moon, Sun, Bell, User as UserIcon, Check, Loader2, ChevronLeft } from 'lucide-react';
+import { Camera, LogOut, Moon, Sun, Bell, User as UserIcon, Check, Loader2, ChevronLeft, Trash2 } from 'lucide-react';
 
 const Settings = ({ isOpen, initialView = 'settings', onClose, onUpdateName, onUpdateProfilePic, socket }) => {
   const [currentView, setCurrentView] = useState(initialView);
@@ -105,6 +105,28 @@ const Settings = ({ isOpen, initialView = 'settings', onClose, onUpdateName, onU
       alert('Upload failed'); 
     } finally { 
       setIsUpdating(false); 
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    if (!window.confirm('Are you sure you want to remove your profile picture?')) return;
+    try {
+      setIsUpdating(true);
+      await api.delete('/api/users/avatar');
+      
+      localStorage.removeItem('profile_pic');
+      setProfilePic(null);
+      setAvatarPreview(null);
+      setSelectedAvatar(null);
+      
+      if (socket) socket.emit('updateProfile', { userId: localStorage.getItem('userId'), profile_pic: null });
+      if (onUpdateProfilePic) onUpdateProfilePic(null);
+      alert('Profile picture removed!');
+    } catch (error) {
+      console.error('Avatar removal failed', error);
+      alert('Failed to remove profile picture');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -276,6 +298,15 @@ const Settings = ({ isOpen, initialView = 'settings', onClose, onUpdateName, onU
                   className="mt-5 bg-brand-purple hover:bg-brand-medium text-white px-5 py-2.5 rounded-full font-bold shadow-lg hover:scale-105 active:scale-95 transition-all border-none cursor-pointer flex items-center gap-2 text-xs"
                 >
                   {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />} Apply Photo
+                </button>
+              )}
+
+              {(!selectedAvatar && profilePic) && (
+                <button 
+                  onClick={handleRemoveAvatar} 
+                  className="mt-4 text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-950/15 dark:hover:bg-red-950/25 px-5 py-2 rounded-full font-bold shadow-sm hover:scale-105 active:scale-95 transition-all border-none cursor-pointer flex items-center justify-center gap-2 text-xs"
+                >
+                  {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />} Remove Photo
                 </button>
               )}
             </div>
