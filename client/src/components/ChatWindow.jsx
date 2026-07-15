@@ -10,6 +10,7 @@ import api, { BASE_URL } from '../utils/api';
 import { encryptMessage } from '../utils/encryption';
 import MessageBubble from './MessageBubble';
 import ProfilePanel from './ProfilePanel';
+import ForwardModal from './ForwardModal';
 
 const formatDateLabel = (dateInput) => {
   if (!dateInput) return '';
@@ -47,6 +48,12 @@ const ChatWindow = ({
   
   // E2EE state
   const [recipientPublicKey, setRecipientPublicKey] = useState(null);
+  
+  // Reply and Forward states
+  const [replyingToMessage, setReplyingToMessage] = useState(null);
+  const [replyPreviewText, setReplyPreviewText] = useState('');
+  const [forwardingMessage, setForwardingMessage] = useState(null);
+  const [forwardingText, setForwardingText] = useState('');
   
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -120,6 +127,30 @@ const ChatWindow = ({
     setShowMenu(false);
   };
 
+  const handleDeleteMessage = async (messageId) => {
+    try {
+      await api.delete(`/api/messages/delete/${messageId}`);
+      setMessages(prev => prev.map(m => (m._id === messageId || m.id === messageId) ? { ...m, isDeleted: true, content: '', fileUrl: null } : m));
+      if (socket) {
+        socket.emit('deleteMessage', { messageId, roomId: activeRoom.id });
+      }
+    } catch (err) {
+      console.error('Failed to delete message:', err);
+      alert('Failed to delete message');
+    }
+  };
+
+  const handleReply = (message, decryptedText) => {
+    setReplyingToMessage(message);
+    setReplyPreviewText(decryptedText);
+    inputRef.current?.focus();
+  };
+
+  const handleForwardInitiate = (message, decryptedText) => {
+    setForwardingMessage(message);
+    setForwardingText(decryptedText);
+  };
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -144,11 +175,24 @@ const ChatWindow = ({
     let senderEncryptedKey = null;
     let iv = null;
 
+    // Quoted reply payload variables
+    const replyToId = replyingToMessage ? (replyingToMessage._id || replyingToMessage.id) : null;
+    const replyToSender = replyingToMessage ? replyingToMessage.senderName : null;
+    const replyTextVal = replyingToMessage ? replyPreviewText : null;
+
     const shouldEncrypt = recipientPublicKey && !selectedFile;
 
     if (shouldEncrypt) {
       try {
-        const encryptedData = await encryptMessage(finalContent, recipientPublicKey);
+        let plaintextToEncrypt = finalContent;
+        if (replyingToMessage) {
+          plaintextToEncrypt = JSON.stringify({
+            type: 'reply',
+            body: finalContent,
+            replyToText: replyPreviewText
+          });
+        }
+        const encryptedData = await encryptMessage(plaintextToEncrypt, recipientPublicKey);
         finalContent = encryptedData.encryptedContent;
         encryptedKey = encryptedData.encryptedKey;
         senderEncryptedKey = encryptedData.senderEncryptedKey;
@@ -184,7 +228,11 @@ const ChatWindow = ({
           isEncrypted,
           encryptedKey,
           senderEncryptedKey,
-          iv
+          iv,
+          // Reply parameters
+          replyTo: replyToId,
+          replyToSenderName: replyToSender,
+          replyToText: replyTextVal
         });
       } catch (err) { console.error('Upload failed:', err); }
       setIsUploading(false);
@@ -201,10 +249,16 @@ const ChatWindow = ({
         isEncrypted,
         encryptedKey,
         senderEncryptedKey,
-        iv
+        iv,
+        // Reply parameters
+        replyTo: replyToId,
+        replyToSenderName: replyToSender,
+        replyToText: shouldEncrypt ? null : replyTextVal // encrypted inside content JSON if E2EE is active
       });
     }
     setInputText('');
+    setReplyingToMessage(null);
+    setReplyPreviewText('');
     inputRef.current?.focus();
   };
 
@@ -399,6 +453,9 @@ const ChatWindow = ({
                     message={msg} 
                     isGroup={isGroup} 
                     isLastSeen={isLastSeen} 
+                    onReply={handleReply}
+                    onForward={handleForwardInitiate}
+                    onDelete={handleDeleteMessage}
                   />
                 </React.Fragment>
               );
@@ -427,6 +484,20 @@ const ChatWindow = ({
             <button onClick={() => { setSelectedFile(null); setFilePreview(null); }}
               className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full border-none bg-transparent cursor-pointer">
               <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        {/* Reply preview bar */}
+        {replyingToMessage && (
+          <div className="mb-2 p-3 bg-gray-50 dark:bg-brand-gray-medium rounded-xl border-l-4 border-brand-purple flex items-center justify-between select-none animate-in slide-in-from-bottom-2 duration-200">
+            <div className="flex flex-col min-w-0 text-left">
+              <span className="text-xs font-bold text-brand-purple">Replying to {replyingToMessage.senderName}</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">{replyPreviewText}</span>
+            </div>
+            <button onClick={() => { setReplyingToMessage(null); setReplyPreviewText(''); }}
+              className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full border-none bg-transparent cursor-pointer">
+              <X className="w-4 h-4 text-gray-500" />
             </button>
           </div>
         )}
@@ -461,6 +532,17 @@ const ChatWindow = ({
           onOpenSearch={handleOpenSearch}
           onBlock={handleBlock}
           conversationId={conversationId}
+        />
+      )}
+
+      {/* ── FORWARD MODAL ─────────────────────────────────────────────────── */}
+      {forwardingMessage && (
+        <ForwardModal
+          onClose={() => { setForwardingMessage(null); setForwardingText(''); }}
+          message={forwardingMessage}
+          decryptedText={forwardingText}
+          username={username}
+          socket={socket}
         />
       )}
     </div>

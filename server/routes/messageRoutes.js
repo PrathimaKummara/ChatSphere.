@@ -29,6 +29,9 @@ router.post('/:messageId/react', authMiddleware, messageController.toggleReactio
 // DELETE /api/messages/:conversationId
 router.delete('/:conversationId', authMiddleware, messageController.clearMessages);
 
+// DELETE /api/messages/delete/:messageId — delete a message
+router.delete('/delete/:messageId', authMiddleware, messageController.deleteMessage);
+
 // ── General message history ───────────────────────────────────────────────────
 // GET /api/messages/:roomId  (must be LAST to not swallow other routes)
 router.get('/:roomId', authMiddleware, messageController.getMessages);

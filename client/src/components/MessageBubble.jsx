@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { Download, FileText, ZoomIn, Phone, Video } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Download, FileText, ZoomIn, Phone, Video, ChevronDown, CornerUpLeft, Forward, Copy, Trash2 } from 'lucide-react';
 import { loadPrivateKey, decryptMessage } from '../utils/encryption';
 import { BASE_URL } from '../utils/api';
 
-const MessageBubble = ({ message, onAvatarClick, isGroup, isLastSeen }) => {
+const MessageBubble = ({ message, onAvatarClick, isGroup, isLastSeen, onReply, onForward, onDelete }) => {
   const currentUserId = localStorage.getItem('userId');
   const isMe = String(message.senderId) === String(currentUserId);
-  
+  const menuRef = useRef(null);
+
   const formatTime = (date) => {
     return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
@@ -14,6 +15,21 @@ const MessageBubble = ({ message, onAvatarClick, isGroup, isLastSeen }) => {
   const [isDownloaded, setIsDownloaded] = useState(() => {
     return localStorage.getItem(`dl_${message.id}`) === 'true';
   });
+
+  const [showActions, setShowActions] = useState(false);
+
+  // Close actions dropdown when clicking outside
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setShowActions(false);
+      }
+    };
+    if (showActions) {
+      document.addEventListener('mousedown', handleOutsideClick);
+    }
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, [showActions]);
 
   const handleDownload = async (e, url, filename) => {
     e.preventDefault();
@@ -38,10 +54,11 @@ const MessageBubble = ({ message, onAvatarClick, isGroup, isLastSeen }) => {
   };
 
   const [decryptedContent, setDecryptedContent] = useState(null);
+  const [decryptedReplyContent, setDecryptedReplyContent] = useState(null);
   const [decryptionError, setDecryptionError] = useState(false);
 
   useEffect(() => {
-    if (message.isEncrypted) {
+    if (message.isEncrypted && !message.isDeleted) {
       const keyToUse = isMe ? (message.senderEncryptedKey || message.encryptedKey) : message.encryptedKey;
       if (!keyToUse || !message.iv || !message.content) {
         setDecryptionError(true);
@@ -53,6 +70,12 @@ const MessageBubble = ({ message, onAvatarClick, isGroup, isLastSeen }) => {
           if (!privateKey) throw new Error('Private key not found locally');
           const text = await decryptMessage(message.content, keyToUse, message.iv, privateKey);
           setDecryptedContent(text);
+
+          // Decrypt reply quote preview if it exists
+          if (message.replyToText && message.replyToTextIv) {
+            const replyText = await decryptMessage(message.replyToText, keyToUse, message.replyToTextIv, privateKey);
+            setDecryptedReplyContent(replyText);
+          }
         } catch (err) {
           console.error('Decryption failed:', err);
           setDecryptionError(true);
@@ -60,16 +83,49 @@ const MessageBubble = ({ message, onAvatarClick, isGroup, isLastSeen }) => {
       };
       decrypt();
     }
-  }, [message]);
+  }, [message, isMe]);
+
+  const getEffectiveContent = () => {
+    if (message.isDeleted) return 'This message was deleted';
+    if (message.type === 'text' || !message.type) {
+      if (message.isEncrypted) {
+        if (decryptedContent !== null) return decryptedContent;
+        if (decryptionError) return '[Encrypted message]';
+        return 'Decrypting...';
+      }
+      return message.content;
+    }
+    return message.fileName || 'Attachment';
+  };
+
+  const getEffectiveReplyContent = () => {
+    if (message.replyToText) {
+      if (message.isEncrypted) {
+        if (decryptedReplyContent !== null) return decryptedReplyContent;
+        return 'Decrypting reply...';
+      }
+      return message.replyToText;
+    }
+    return 'Attachment';
+  };
+
+  const handleCopy = () => {
+    const textToCopy = getEffectiveContent();
+    navigator.clipboard.writeText(textToCopy);
+    setShowActions(false);
+  };
 
   const renderContent = () => {
+    if (message.isDeleted) {
+      return (
+        <p className="text-[14.5px] italic text-gray-400 dark:text-gray-500 flex items-center gap-1.5 select-none">
+          <Trash2 className="w-3.5 h-3.5" /> This message was deleted
+        </p>
+      );
+    }
+
     if (message.type === 'text' || !message.type) {
-      let displayContent = message.content;
-      if (message.isEncrypted) {
-        if (decryptedContent !== null) displayContent = decryptedContent;
-        else if (decryptionError) displayContent = '[Encrypted message]';
-        else displayContent = 'Decrypting...';
-      }
+      const displayContent = getEffectiveContent();
       return <p className="text-[14.5px] leading-relaxed break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{displayContent}</p>;
     }
 
@@ -155,9 +211,8 @@ const MessageBubble = ({ message, onAvatarClick, isGroup, isLastSeen }) => {
 
   if (message.type === 'call') return renderCallBubble();
 
-
   return (
-    <div className={`flex items-end px-[10px] md:px-[20px] animate-in slide-in-from-bottom-1 duration-300 ${isMe ? 'justify-end' : 'justify-start'}`}>
+    <div className={`flex items-end px-[10px] md:px-[20px] animate-in slide-in-from-bottom-1 duration-300 group ${isMe ? 'justify-end' : 'justify-start'}`}>
       {(!isMe && isGroup) && (
         <div onClick={() => onAvatarClick && onAvatarClick(message.senderId)} className="w-8 h-8 rounded-full bg-[#6c3bd4] flex items-center justify-center text-white text-[10px] font-bold mb-1 mr-2 cursor-pointer shadow-sm flex-shrink-0 overflow-hidden relative">
           {message.senderProfilePic && (
@@ -181,15 +236,82 @@ const MessageBubble = ({ message, onAvatarClick, isGroup, isLastSeen }) => {
         </div>
       )}
       
-      <div className={`max-w-[85%] md:max-w-[70%] lg:max-w-[60%] flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-        <div className={`relative px-4 py-2.5 shadow-sm ${isMe 
-          ? 'bg-[#6c3bd4] text-white rounded-2xl rounded-tr-none' 
-          : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-2xl rounded-tl-none border border-[#e8e8f0] dark:border-transparent'}`}>
-          {renderContent()}
-          <div className={`flex items-center justify-end gap-1 mt-1 ${isMe ? 'text-white/60' : 'text-gray-400'}`}>
-            <span className="text-[10px] font-medium">{formatTime(message.createdAt)}</span>
+      <div className={`max-w-[85%] md:max-w-[70%] lg:max-w-[60%] flex flex-col ${isMe ? 'items-end' : 'items-start'} relative`}>
+        {/* Forwarded Header Indicator */}
+        {message.isForwarded && !message.isDeleted && (
+          <span className="text-[10px] text-gray-400 dark:text-gray-500 italic mb-1 flex items-center gap-1 select-none">
+            <Forward className="w-3 h-3" /> Forwarded
+          </span>
+        )}
+
+        {/* Message bubble core wrapper (horizontal alignment for hover action trigger) */}
+        <div className={`flex items-center gap-2 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
+          <div className={`relative px-4 py-2.5 shadow-sm ${isMe 
+            ? 'bg-[#6c3bd4] text-white rounded-2xl rounded-tr-none' 
+            : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-2xl rounded-tl-none border border-[#e8e8f0] dark:border-transparent'}`}>
+            
+            {/* Quoted Reply Block */}
+            {message.replyTo && !message.isDeleted && (
+              <div className={`border-l-4 ${isMe ? 'border-white/50 bg-white/10' : 'border-brand-purple bg-brand-purple/5'} px-3 py-1.5 rounded-r-lg mb-2 text-left text-xs select-none max-w-full overflow-hidden`}>
+                <p className={`font-bold ${isMe ? 'text-white' : 'text-brand-purple'}`}>{message.replyToSenderName}</p>
+                <p className={`truncate mt-0.5 ${isMe ? 'text-white/80' : 'text-gray-500 dark:text-gray-400'}`}>{getEffectiveReplyContent()}</p>
+              </div>
+            )}
+
+            {renderContent()}
+
+            <div className={`flex items-center justify-end gap-1 mt-1 ${isMe ? 'text-white/60' : 'text-gray-400'}`}>
+              <span className="text-[10px] font-medium">{formatTime(message.createdAt)}</span>
+            </div>
           </div>
+
+          {/* Hover Menu Button (Hidden for deleted messages) */}
+          {!message.isDeleted && (
+            <div className="relative flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200" ref={menuRef}>
+              <button 
+                onClick={() => setShowActions(!showActions)}
+                className="w-7 h-7 rounded-full bg-white dark:bg-gray-800 shadow-md border border-gray-100 dark:border-white/5 flex items-center justify-center text-gray-500 hover:text-brand-purple hover:scale-105 active:scale-95 transition-all cursor-pointer"
+              >
+                <ChevronDown className="w-4 h-4" />
+              </button>
+
+              {/* Actions Dropdown */}
+              {showActions && (
+                <div className={`absolute z-30 bottom-8 ${isMe ? 'right-0' : 'left-0'} bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 shadow-2xl rounded-2xl p-1.5 w-36 space-y-0.5 animate-in fade-in slide-in-from-bottom-2 duration-200`}>
+                  <button 
+                    onClick={() => { onReply(message, getEffectiveContent()); setShowActions(false); }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl border-none bg-transparent cursor-pointer text-left"
+                  >
+                    <CornerUpLeft className="w-4 h-4 text-gray-400" /> Reply
+                  </button>
+                  {message.type === 'text' && (
+                    <button 
+                      onClick={handleCopy}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl border-none bg-transparent cursor-pointer text-left"
+                    >
+                      <Copy className="w-4 h-4 text-gray-400" /> Copy
+                    </button>
+                  )}
+                  <button 
+                    onClick={() => { onForward(message, getEffectiveContent()); setShowActions(false); }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl border-none bg-transparent cursor-pointer text-left"
+                  >
+                    <Forward className="w-4 h-4 text-gray-400" /> Forward
+                  </button>
+                  {isMe && (
+                    <button 
+                      onClick={() => { if (window.confirm('Delete this message?')) onDelete(message._id || message.id); setShowActions(false); }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/15 rounded-xl border-none bg-transparent cursor-pointer text-left"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-400" /> Delete
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
+
         {isLastSeen && (
           <span className="text-[11px] text-gray-400 dark:text-gray-500 mt-1 mr-1 animate-in fade-in duration-300">seen</span>
         )}

@@ -380,3 +380,41 @@ exports.checkDirectConversation = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+// ── DELETE /api/messages/delete/:messageId ────────────────────────────────────
+exports.deleteMessage = async (req, res) => {
+  try {
+    const { messageId } = req.params;
+    const userId = req.user.id;
+
+    // Find the message in MongoDB
+    const message = await Message.findById(messageId);
+    if (!message) {
+      return res.status(404).json({ message: 'Message not found' });
+    }
+
+    // Verify that the user is the sender of the message
+    if (String(message.senderId) !== String(userId)) {
+      return res.status(403).json({ message: 'Unauthorized to delete this message' });
+    }
+
+    // Clear content, file links and mark as deleted
+    message.isDeleted = true;
+    message.content = '';
+    message.fileUrl = null;
+    message.fileName = null;
+    message.fileType = null;
+    message.size = 0;
+    message.isEncrypted = false;
+    message.encryptedKey = null;
+    message.senderEncryptedKey = null;
+    message.iv = null;
+
+    await message.save();
+
+    res.status(200).json({ message: 'Message deleted successfully', data: message });
+  } catch (error) {
+    console.error('Error deleting message:', error);
+    res.status(500).json({ message: 'Server error while deleting message' });
+  }
+};

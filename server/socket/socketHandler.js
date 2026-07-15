@@ -179,7 +179,8 @@ const socketHandler = (io) => {
         if (!messageData.content && !messageData.fileUrl) return;
         const {
           senderId, senderName, senderProfilePic, roomId, type = 'text', fileUrl, fileName, fileType, size,
-          isEncrypted = false, encryptedKey = null, senderEncryptedKey = null, iv = null
+          isEncrypted = false, encryptedKey = null, senderEncryptedKey = null, iv = null,
+          isForwarded = false, replyTo = null, replyToSenderName = null, replyToText = null, replyToTextIv = null
         } = messageData;
         const content = (messageData.content || '').toString();
         const cleanId = (roomId || '').replace('dm_', '');
@@ -187,6 +188,7 @@ const socketHandler = (io) => {
         const newMessage = new Message({
           senderId, senderName, senderProfilePic, content, roomId, conversationId: cleanId, status: 'sent', type, fileUrl, fileName, fileType, size,
           isEncrypted, encryptedKey, senderEncryptedKey, iv,
+          isForwarded, replyTo, replyToSenderName, replyToText, replyToTextIv,
           ...(type === 'call' ? { callType: messageData.callType || 'audio', duration: messageData.duration || 0 } : {})
         });
 
@@ -214,6 +216,10 @@ const socketHandler = (io) => {
           iv: isEncrypted ? iv : null
         });
       } catch (error) { console.error('sendMessage error:', error); }
+    });
+
+    socket.on('deleteMessage', ({ messageId, roomId }) => {
+      io.to(roomId).emit('messageDeleted', { messageId });
     });
 
     socket.on('readMessages', async ({ roomId, userId }) => {

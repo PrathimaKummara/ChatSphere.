@@ -57,6 +57,14 @@ const messageSchema = new mongoose.Schema({
   senderEncryptedKey: { type: String, default: null },
   iv: { type: String, default: null },
 
+  // Reply, Forward, Delete fields
+  isDeleted: { type: Boolean, default: false },
+  isForwarded: { type: Boolean, default: false },
+  replyTo: { type: mongoose.Schema.Types.ObjectId, ref: 'Message', default: null },
+  replyToSenderName: { type: String, default: null },
+  replyToText: { type: String, default: null },
+  replyToTextIv: { type: String, default: null },
+
   // Status tracking
   status: { 
     type: String, 

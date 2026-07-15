@@ -192,8 +192,15 @@ const Chat = () => {
     };
 
     socket.on('newMessage', handleNewMessage);
+
+    const handleMessageDeleted = ({ messageId }) => {
+      setMessages(prev => prev.map(m => (String(m._id || m.id) === String(messageId)) ? { ...m, isDeleted: true, content: '', fileUrl: null } : m));
+    };
+
+    socket.on('messageDeleted', handleMessageDeleted);
     return () => {
       socket.off('newMessage', handleNewMessage);
+      socket.off('messageDeleted', handleMessageDeleted);
     };
   }, [socket, activeRoom, userId]);
 
