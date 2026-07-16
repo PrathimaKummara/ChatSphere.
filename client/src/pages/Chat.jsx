@@ -35,13 +35,6 @@ const Chat = () => {
     }
   }, [userId]);
 
-  // Ensure E2EE keys are initialized for existing sessions
-  useEffect(() => {
-    if (userId) {
-      initE2EE(api);
-    }
-  }, [userId]);
-
   if (!userId) return null;
 
   // --- 3. UI STATE ---
@@ -65,7 +58,13 @@ const Chat = () => {
       if (res.data.about) {
         localStorage.setItem('about', res.data.about);
       }
-    }).catch(() => {});
+      // Initialize E2EE keypair with device key synchronization
+      initE2EE(api, res.data.publicKey, res.data.privateKey);
+    }).catch((err) => {
+      console.error('Error syncing profile:', err);
+      // Fallback
+      initE2EE(api);
+    });
   }, [userId]);
 
   // --- 4. NOTIFICATION SOUND ---
@@ -227,6 +226,28 @@ const Chat = () => {
     };
   }, [socket, activeRoom]);
 
+  // Handle system back button on mobile to close the active chat room instead of exiting
+  useEffect(() => {
+    if (!activeRoom) return;
+
+    // Push a dummy state to history so there is something to pop
+    window.history.pushState({ chatRoomOpen: true }, '');
+
+    const handlePopState = (e) => {
+      // If we go back, close the active room
+      setActiveRoom(null);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      // Clean up the dummy history state if we close the chat programmatically
+      if (window.history.state?.chatRoomOpen) {
+        window.history.back();
+      }
+    };
+  }, [activeRoom]);
+
   // Wrapper for sending messages
   const sendMessage = (messageData) => {
     if (socket) {
@@ -246,7 +267,7 @@ const Chat = () => {
   };
 
   return (
-    <div className="flex h-screen w-full bg-white dark:bg-gray-900 overflow-hidden relative font-sans transition-colors duration-300">
+    <div className="fixed inset-0 flex bg-white dark:bg-gray-900 overflow-hidden relative font-sans transition-colors duration-300">
       
       {/* GLOBAL CALL MODAL */}
       <CallModal 

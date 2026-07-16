@@ -24,11 +24,21 @@ exports.getOwnProfile = async (req, res) => {
   try {
     const userId = req.user.id;
     const [rows] = await db.query(
-      'SELECT id, username, email, profile_pic, about FROM Users WHERE id = ?',
+      'SELECT id, username, email, profile_pic, about, public_key, private_key FROM Users WHERE id = ?',
       [userId]
     );
     if (rows.length === 0) return res.status(404).json({ message: 'User not found' });
-    res.status(200).json(rows[0]);
+    
+    const user = rows[0];
+    res.status(200).json({
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      profile_pic: user.profile_pic,
+      about: user.about,
+      publicKey: user.public_key,
+      privateKey: user.private_key
+    });
   } catch (error) {
     console.error('Error fetching own profile:', error);
     res.status(500).json({ message: 'Server error while fetching own profile' });

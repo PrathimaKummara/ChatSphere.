@@ -137,14 +137,10 @@ export async function initE2EE(api, serverPublicKey = null, serverPrivateKey = n
     const userId = localStorage.getItem('userId');
     if (!userId) return;
 
-    // Restore server keys if local keys are missing
+    // Restore and synchronize server keys if provided
     if (serverPublicKey && serverPrivateKey) {
-      const localPub = await getFromIDB(`publicKey_${userId}`);
-      const localPriv = await getFromIDB(`privateKey_${userId}`);
-      if (!localPub || !localPriv) {
-        await saveToIDB(`publicKey_${userId}`, serverPublicKey);
-        await saveToIDB(`privateKey_${userId}`, serverPrivateKey);
-      }
+      await saveToIDB(`publicKey_${userId}`, serverPublicKey);
+      await saveToIDB(`privateKey_${userId}`, serverPrivateKey);
     }
 
     let privateKeyB64 = await getFromIDB(`privateKey_${userId}`);
