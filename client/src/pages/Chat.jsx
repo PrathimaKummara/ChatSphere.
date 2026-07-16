@@ -266,6 +266,17 @@ const Chat = () => {
     }
   };
 
+  // Lock window scroll position on mobile to prevent viewport shifting when inputs are focused
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY !== 0) {
+        window.scrollTo(0, 0);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <div className="fixed inset-0 flex bg-white dark:bg-gray-900 overflow-hidden relative font-sans transition-colors duration-300">
       
@@ -298,7 +309,7 @@ const Chat = () => {
       />
 
       {/* Left Sidebar - Full width on mobile when no chat is open, 380px on desktop */}
-      <div className={`w-full md:w-[380px] flex-shrink-0 h-full ${activeRoom ? 'hidden md:flex' : 'flex'}`}>
+      <div className={`w-full md:w-[380px] flex-shrink-0 h-full overflow-hidden ${activeRoom ? 'hidden md:flex' : 'flex flex-col overflow-hidden'}`}>
         <Sidebar 
           activeRoom={activeRoom} 
           setActiveRoom={setActiveRoom} 
@@ -313,7 +324,7 @@ const Chat = () => {
       </div>
 
       {/* Primary Chat Interface - Full width on mobile when chat is open, flex-1 on desktop */}
-      <div className={`flex-1 min-w-0 h-full ${!activeRoom ? 'hidden md:flex' : 'flex flex-col'}`}>
+      <div className={`flex-1 min-w-0 h-full overflow-hidden ${!activeRoom ? 'hidden md:flex' : 'flex flex-col overflow-hidden'}`}>
         <ChatWindow 
           activeRoom={activeRoom} 
           setActiveRoom={setActiveRoom} 
