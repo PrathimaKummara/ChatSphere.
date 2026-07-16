@@ -291,7 +291,7 @@ const ChatWindow = ({
   const conversationId = activeRoom.id; // e.g. "dm_42"
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-brand-black relative flex-1 min-w-0 overflow-hidden">
+    <div className="absolute inset-0 flex flex-col bg-white dark:bg-brand-black overflow-hidden">
       
       {/* ── HEADER ─────────────────────────────────────────────────────────── */}
       <div className="h-[64px] px-4 flex items-center justify-between border-b border-[#e8e8f0] dark:border-brand-gray-light bg-white/80 dark:bg-brand-black/80 backdrop-blur-md z-20 shadow-sm relative flex-shrink-0">
