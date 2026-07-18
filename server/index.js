@@ -138,6 +138,36 @@ app.get('/', (req, res) => {
 // Attach our real-time event listeners to the Socket.IO instance
 socketHandler(io);
 
+// Admin database cleanup route - clears all chats/conversations/messages, keeps users.
+app.post('/api/admin/clear-chats', async (req, res) => {
+  const { passcode } = req.body;
+  if (passcode !== 'clear_chats_xyz_987') {
+    return res.status(403).json({ message: 'Unauthorized' });
+  }
+
+  try {
+    // 1. Clear MySQL Tables
+    await db.query('SET FOREIGN_KEY_CHECKS = 0');
+    await db.query('DELETE FROM callhistory');
+    await db.query('DELETE FROM RoomMembers');
+    await db.query('DELETE FROM Rooms');
+    await db.query('DELETE FROM DirectConversations');
+    await db.query('DELETE FROM MessageRequests');
+    await db.query('SET FOREIGN_KEY_CHECKS = 1');
+    console.log('MySQL chat/conversation tables cleared.');
+
+    // 2. Clear MongoDB Messages
+    const Message = mongoose.model('Message');
+    await Message.deleteMany({});
+    console.log('MongoDB messages collection cleared.');
+
+    res.status(200).json({ message: 'All chats and conversations cleared successfully!' });
+  } catch (error) {
+    console.error('Failed to clear database chats:', error);
+    res.status(500).json({ message: 'Internal server error during database cleanup', error: error.message });
+  }
+});
+
 // Determine the port from environment variables or default to 5000
 const PORT = process.env.PORT || 5000;
 
