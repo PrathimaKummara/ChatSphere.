@@ -77,7 +77,7 @@ const MessageBubble = ({ message, onAvatarClick, isGroup, isLastSeen, onReply, o
             setDecryptedReplyContent(replyText);
           }
         } catch (err) {
-          console.error('Decryption failed:', err);
+          console.warn('Decryption failed: Key mismatch (expected for historical messages sent prior to a key reset).');
           setDecryptionError(true);
         }
       };
