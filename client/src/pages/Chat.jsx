@@ -324,7 +324,7 @@ const Chat = () => {
       </div>
 
       {/* Primary Chat Interface - Full width on mobile when chat is open, flex-1 on desktop */}
-      <div className={`flex-1 min-w-0 h-full overflow-hidden relative ${!activeRoom ? 'hidden md:flex' : 'flex flex-col overflow-hidden relative'}`}>
+      <div className={`flex-1 min-w-0 h-full overflow-hidden ${!activeRoom ? 'hidden md:flex' : 'flex flex-col overflow-hidden'}`}>
         <ChatWindow 
           activeRoom={activeRoom} 
           setActiveRoom={setActiveRoom} 
