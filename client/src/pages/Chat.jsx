@@ -278,7 +278,7 @@ const Chat = () => {
   }, []);
 
   return (
-    <div className="fixed inset-0 flex bg-white dark:bg-gray-900 overflow-hidden relative font-sans transition-colors duration-300">
+    <div className="fixed inset-0 flex bg-white dark:bg-gray-900 overflow-hidden font-sans transition-colors duration-300">
       
       {/* GLOBAL CALL MODAL */}
       <CallModal 
