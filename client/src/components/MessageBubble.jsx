@@ -85,12 +85,31 @@ const MessageBubble = ({ message, onAvatarClick, isGroup, isLastSeen, onReply, o
     }
   }, [message, isMe]);
 
+  const getParsedContent = () => {
+    if (message.isEncrypted) {
+      if (decryptedContent !== null) {
+        try {
+          if (decryptedContent.startsWith('{"type":"reply"')) {
+            const parsed = JSON.parse(decryptedContent);
+            if (parsed && parsed.type === 'reply') {
+              return parsed;
+            }
+          }
+        } catch (_) {}
+        return { body: decryptedContent };
+      }
+      return null;
+    }
+    return { body: message.content, replyToText: message.replyToText };
+  };
+
   const getEffectiveContent = () => {
     if (message.isDeleted) return 'This message was deleted';
     if (message.type === 'text' || !message.type) {
       if (message.isEncrypted) {
-        if (decryptedContent !== null) return decryptedContent;
         if (decryptionError) return '[Encrypted message]';
+        const parsed = getParsedContent();
+        if (parsed) return parsed.body;
         return 'Decrypting...';
       }
       return message.content;
@@ -99,14 +118,12 @@ const MessageBubble = ({ message, onAvatarClick, isGroup, isLastSeen, onReply, o
   };
 
   const getEffectiveReplyContent = () => {
-    if (message.replyToText) {
-      if (message.isEncrypted) {
-        if (decryptedReplyContent !== null) return decryptedReplyContent;
-        return 'Decrypting reply...';
-      }
-      return message.replyToText;
+    if (message.isEncrypted) {
+      const parsed = getParsedContent();
+      if (parsed) return parsed.replyToText || 'Attachment';
+      return 'Decrypting reply...';
     }
-    return 'Attachment';
+    return message.replyToText || 'Attachment';
   };
 
   const handleCopy = () => {

@@ -320,9 +320,18 @@ const Sidebar = ({ activeRoom, setActiveRoom, onlineUsers, username, profilePic,
     // If the flag is set and decryption hasn't happened yet, or if it looks like base64
     if (last.isEncrypted) return '🔒 Encrypted message';
     
+    let content = last.content;
+    try {
+      if (content.startsWith('{"type":"reply"')) {
+        const parsed = JSON.parse(content);
+        if (parsed && parsed.body) {
+          content = parsed.body;
+        }
+      }
+    } catch (_) {}
+
     // Fallback heuristic: base64-looking string with no spaces (catches edge cases)
     // Only apply if it's long and doesn't look like a standard call/file label
-    const content = last.content;
     const looksEncrypted = content.length > 24
       && !content.includes(' ')
       && /^[A-Za-z0-9+/]+=*$/.test(content);
