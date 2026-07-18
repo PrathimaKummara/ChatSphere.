@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import api, { BASE_URL } from '../utils/api';
 import { Camera, LogOut, Moon, Sun, Bell, User as UserIcon, Check, Loader2, ChevronLeft, Trash2 } from 'lucide-react';
+import { forceResetE2EEKeys } from '../utils/encryption';
 
 const Settings = ({ isOpen, initialView = 'settings', onClose, onUpdateName, onUpdateProfilePic, socket }) => {
   const [currentView, setCurrentView] = useState(initialView);
@@ -14,6 +15,8 @@ const Settings = ({ isOpen, initialView = 'settings', onClose, onUpdateName, onU
   const [isDarkMode, setIsDarkMode] = useState(localStorage.getItem('theme') === 'dark');
   const [notificationsEnabled, setNotificationsEnabled] = useState(localStorage.getItem('notifications') !== 'false');
   const [aboutText, setAboutText] = useState(localStorage.getItem('about') || 'Hey there! I am using ChatSphere.');
+  const [isResettingKeys, setIsResettingKeys] = useState(false);
+  const [resetKeysSuccess, setResetKeysSuccess] = useState(false);
   
   // Ref for file input trigger
   const [selectedAvatar, setSelectedAvatar] = useState(null);
@@ -135,6 +138,22 @@ const Settings = ({ isOpen, initialView = 'settings', onClose, onUpdateName, onU
     setIsDarkMode(newTheme);
     document.documentElement.classList.toggle('dark', newTheme);
     localStorage.setItem('theme', newTheme ? 'dark' : 'light');
+  };
+
+  const handleResetE2EEKeys = async () => {
+    if (!window.confirm("Warning: Resetting keys will allow all your devices to sync to a fresh encryption state, but you won't be able to decrypt past conversations. Do you wish to proceed?")) return;
+    setIsResettingKeys(true);
+    setResetKeysSuccess(false);
+    try {
+      await forceResetE2EEKeys(api);
+      setResetKeysSuccess(true);
+      setTimeout(() => setResetKeysSuccess(false), 5000);
+    } catch (err) {
+      console.error('Failed to reset keys:', err);
+      alert('Failed to reset E2EE keys. Please try again.');
+    } finally {
+      setIsResettingKeys(false);
+    }
   };
 
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -364,6 +383,23 @@ const Settings = ({ isOpen, initialView = 'settings', onClose, onUpdateName, onU
                 </button>
               </div>
               {aboutSuccess && <p className="text-[10px] text-green-500 font-bold mt-1">✓ About bio updated</p>}
+            </div>
+
+            {/* E2EE Key Management */}
+            <div className="mx-2 bg-white dark:bg-brand-gray-dark p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm space-y-3">
+              <span className="text-[11px] font-bold text-brand-purple uppercase tracking-wider block">End-to-End Encryption</span>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                If you encounter decryption errors on this device, resetting your encryption keys will establish a new clean E2EE state across all your active devices.
+              </p>
+              <button 
+                onClick={handleResetE2EEKeys} 
+                disabled={isResettingKeys}
+                className="w-full py-2.5 bg-brand-purple/10 hover:bg-brand-purple/20 text-brand-purple font-bold rounded-xl transition-all border-none cursor-pointer text-xs flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isResettingKeys ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                Reset E2EE Keys
+              </button>
+              {resetKeysSuccess && <p className="text-[10px] text-green-500 font-bold mt-1 text-center">✓ E2EE keys successfully reset!</p>}
             </div>
           </div>
         )}

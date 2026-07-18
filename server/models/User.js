@@ -66,13 +66,13 @@ const User = {
 
   // Save the user's RSA private key for recovery
   setPrivateKey: async (userId, privateKeyBase64) => {
-    try { await db.query('ALTER TABLE Users ADD COLUMN private_key TEXT DEFAULT NULL'); } catch (_) {}
+    try { await db.query('ALTER TABLE Users ADD COLUMN private_key MEDIUMTEXT DEFAULT NULL'); } catch (_) {}
     await db.query('UPDATE Users SET private_key = ? WHERE id = ?', [privateKeyBase64, userId]);
   },
 
   // Retrieve a user's RSA private key
   getPrivateKey: async (userId) => {
-    try { await db.query('ALTER TABLE Users ADD COLUMN private_key TEXT DEFAULT NULL'); } catch (_) {}
+    try { await db.query('ALTER TABLE Users ADD COLUMN private_key MEDIUMTEXT DEFAULT NULL'); } catch (_) {}
     const [rows] = await db.query('SELECT private_key FROM Users WHERE id = ?', [userId]);
     return rows[0]?.private_key;
   }

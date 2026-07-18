@@ -265,3 +265,19 @@ export async function decryptMessage(encryptedContentB64, encryptedKeyB64, ivB64
   const decoder = new TextDecoder();
   return decoder.decode(decryptedBuffer);
 }
+
+// ── forceResetE2EEKeys — resets the key pair and uploads it ──────────────────
+export async function forceResetE2EEKeys(api) {
+  const userId = localStorage.getItem('userId');
+  if (!userId) return;
+
+  // Import key generation helpers from this file
+  const keyPair = await generateKeyPair();
+  const privateKeyB64 = await exportPrivateKey(keyPair.privateKey);
+  const publicKeyB64 = await exportPublicKey(keyPair.publicKey);
+
+  await saveToIDB(`privateKey_${userId}`, privateKeyB64);
+  await saveToIDB(`publicKey_${userId}`, publicKeyB64);
+
+  await api.put('/api/users/public-key', { publicKey: publicKeyB64, privateKey: privateKeyB64 });
+}

@@ -120,7 +120,14 @@ async function initDatabase() {
         FOREIGN KEY (to_user_id) REFERENCES Users(id) ON DELETE CASCADE
       ) ENGINE=InnoDB;
     `);
-    console.log('MessageRequests table verified/created.');
+    // Convert public_key and private_key columns to MEDIUMTEXT to prevent key truncation issues
+    try {
+      await db.query('ALTER TABLE Users MODIFY COLUMN public_key MEDIUMTEXT DEFAULT NULL');
+      await db.query('ALTER TABLE Users MODIFY COLUMN private_key MEDIUMTEXT DEFAULT NULL');
+      console.log('E2EE key columns verified/converted to MEDIUMTEXT.');
+    } catch (e) {
+      console.error('Column conversion failed or skipped:', e.message);
+    }
 
     console.log('Database initialization completed successfully.');
   } catch (err) {
